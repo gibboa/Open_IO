@@ -1,0 +1,138 @@
+<!-- This code is not original, it is based on the video guide found at 
+https://www.youtube.com/watch?v=KoWqdEACyLI with only minor experimental changes.
+The comments were added as well as variables changed to aid understanding.
+
+This is a very basic pong game. It is written in javascript
+using the HTML5 Canvas element
+
+This is only a single player game which exists to demonstrate
+the use drawing on a canvas with javascript as well as the basic
+Update/Draw steps of a game loop
+
+To Run this code, simply open it in a browser with javascript enabled-->
+
+<canvas id="gb" width="640" height="480"></canvas>
+<script>
+	//declaring some global vars for script
+	p1_width = p2_width = 10;
+	p1_height = p2_height = 100;
+	p1_y = p2_y = 200;	//starting loc
+	ball_x = ball_y = 200; //starting loc
+	ball_size = 8;	//dimension used for drawing ball
+	ball_v_x = ball_v_y = 5; //initial ball velocity
+	p1_score = p2_score = 0;
+	ai_speed = 10; //speed of paddle for bot opponent
+	//collision_count = 0 //want top increase ball speed in x direction with number of consecutive volleys
+
+	//function will be called when window loads for the first time
+	window.onload=function() {
+		//gameboard contains the <canvas> element above
+		gameboard = document.getElementById('gb');
+		//drawBuf is an object that will draw on our canvas
+		drawBuf = gameboard.getContext('2d');
+		//setInterval calls function fiven by first arg, every x milliseconds given by second arg
+		//so: call update() 30 times a second
+		setInterval(update, 1000/60);
+		//add event listener for player input
+		//pass it an inline anon function
+		gameboard.addEventListener('mousemove', function(e){
+			//e is an object passed into event listener containing data from mousmove event (has coords of cursor at least)
+			//so p1_y will get the y coord of mouse minus half the paddle height so that the middle of the paddle and cursor
+			//both share the same y coordinate
+			p1_y = e.clientY-(p1_height/2);
+		});
+	}
+
+	//function to reset gameboard when someone scores
+	function reset(){
+		ball_x = gameboard.width/2;
+		ball_y = gameboard.height/2;
+		if(ball_v_x < 0){
+			ball_v_x = 5;
+		}else{
+			ball_v_x = -5;
+		}
+		//ball_v_x = -ball_v_x;
+		ball_v_y = 3;
+		//collision_count = 0;
+	}
+	//game runs in this function
+	//first update vars, then redraw everything
+	function update() {
+		//update game data
+		//playing with delta time concept....pointless
+		ball_x += Math.round(ball_v_x*0.016*60);
+		ball_y += Math.round(ball_v_y*0.016*60);
+		//Test ball collision with boundaries
+		//if ball moving down and hits wall
+		if(ball_y<0 && ball_v_y<0){
+			//reverse direction
+			ball_v_y = -ball_v_y;
+		}
+		//if ball is moving up and hits wall
+		if(ball_y > gameboard.height && ball_v_y > 0){
+			ball_v_y = -ball_v_y;
+		}
+		//collisions in x direction on the left side:
+		if(ball_x < 0){
+			//did it hit a paddle or not?
+			if(ball_y > p1_y && ball_y < p1_y + p1_height){
+				//ball hits paddle so reverse x velocity
+				//collision_count++;
+				ball_v_y -= 3
+				ball_v_x = -ball_v_x;
+				//y velocity (angle of bounce) will be determined by the collisions distance from the center of the paddle:
+				delta_y = ball_y - (p1_y + p1_height/2);
+				//coeff 0.3 lets us adjust extremity of angle
+				ball_v_y = delta_y*0.3;
+			}else{
+				//the paddle misses the ball
+				p2_score++;//increment opposite players score
+				reset();//reset function to get new ball
+			}
+		}
+		//collisions in x direction on the right side:
+		if(ball_x > gameboard.width){
+			//did it hit a paddle or not?
+			if(ball_y > p2_y && ball_y < p2_y + p2_height){
+				//ball hits paddle so reverse x velocity
+				//collision_count++;
+				ball_v_x += 3;
+				ball_v_x = -ball_v_x;
+				//y velocity (angle of bounce) will be determined by the collisions distance from the center of the paddle:
+				delta_y = ball_y - (p2_y + p2_height/2);
+				//coeff 0.3 lets us adjust extremity of angle
+				ball_v_y = delta_y*0.3;
+			}else{
+				//the paddle misses the ball
+				p1_score++;//increment opposite players score
+				reset();//reset function to get new ball
+			}
+		}
+
+		//some dumb ai to update paddle 2
+		if(p2_y + p2_height/2 < ball_y){
+			//bot paddle moves up to chase ball
+			p2_y += ai_speed;
+		}else{
+			//bot paddle moves down to chase ball
+			p2_y -= ai_speed;
+		}
+
+		//draw board
+		drawBuf.fillStyle = 'black';
+		drawBuf.fillRect(0,0,gameboard.width,gameboard.height);
+		//draw paddles
+		drawBuf.fillStyle = 'white';
+		//p1 on left side, p2 on right
+		//first two args are lower left corner
+		drawBuf.fillRect(0,p1_y,p1_width,p1_height);
+		drawBuf.fillRect(gameboard.width - p1_width,p2_y,p2_width,p2_height);
+		//draw ball
+		drawBuf.fillRect(ball_x-(ball_size/2), ball_y - (ball_size/2), ball_size, ball_size);
+		//draw scores
+		drawBuf.fillText(p1_score, 100, 25);
+		drawBuf.fillText(p2_score, gameboard.width -100, 25);
+
+	}
+</script>
