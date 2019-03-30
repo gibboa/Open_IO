@@ -20,7 +20,7 @@ Some extra comments are added to help new developers understand the HTML
 </head>
 
 <body><!--body contains everything to be displayed in the display portion of the browser-->
-	<canvas id="canvas"></canvas>
+	<canvas id="canvas" tabindex='1'></canvas> <!--the tabindex is supposed to make the canvas focusable-->
 	<div id="game_barrier">
 		<div id="name_box">
 			<input type="text" id="player_name" value="Enter Your Name..." onfocus="this.value='';" />
