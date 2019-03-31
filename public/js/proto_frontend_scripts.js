@@ -22,7 +22,13 @@ function initGame(){
 	gameboard = $('canvas');
 	//drawBuf is an object that will draw on our canvas
 	ctx = gameboard.getContext('2d');
-	
+
+	//Establishing Connection to Game Server
+	var socket = io.connect('http://localhost:8081');
+	socket.on('connect', function(){
+		alert("you are connected")
+	});
+
 	//setInterval calls function fiven by first arg, every x milliseconds given by second arg
 	//so: call update() 30 times a second
 	setInterval(update, 1000/30);

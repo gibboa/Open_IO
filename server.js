@@ -28,6 +28,7 @@ io.on('connection', function (socket) {
     	x: Math.floor(Math.random() * 320) + 160, 
     	y: Math.floor(Math.random() * 320) + 160, //place player randomly between 160px-480px (not too close to edge)
     	playerId: socket.id,
+    	//we would have name data from client but dont know how to get it to the server yet
   	};
 
   	// update all other players of the new player
