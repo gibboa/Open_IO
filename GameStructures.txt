@@ -10,6 +10,7 @@ Players_list: "Players"
     length
     score
     velocity
+    color
 
 Object: game_object
   contains:
