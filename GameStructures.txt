@@ -1,0 +1,20 @@
+This files describes the structures used to represent the games state. Use as a references when writing code.
+
+Players_list: "Players"
+//maps socket.id to a player record which contains:
+    position_list:
+        [ x coord, y coord, time ] //top of list is head of snake
+    ID
+    name
+    orientation
+    length
+    score
+    velocity
+
+Object: game_object
+  contains:
+      players_list
+      food_list
+      
+
+      
