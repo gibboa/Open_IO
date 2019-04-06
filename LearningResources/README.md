@@ -15,7 +15,7 @@ Contained in this folder is the code from some tutorials related to the subject.
 
 ![pong game](pong_html5_canvas.PNG)
 
-Check out our copy of the [tutorial code](). FIXLINK We tried to make the variable names more readable than in the video, and added comments to help aid understanding for newcomers. You'll also find that our version has been tweaked a bit.
+Check out our copy of the [tutorial code](https://github.com/gibboa/Open_IO/tree/master/LearningResources/HTMLCanvas-Pong). We tried to make the variable names more readable than in the video, and added comments to help aid understanding for newcomers. You'll also find that our version has been tweaked a bit.
 
 Watch the tutorial on Youtube [here](https://www.youtube.com/watch?v=KoWqdEACyLI).
 
