@@ -21,7 +21,7 @@ Watch the tutorial on Youtube [here](https://www.youtube.com/watch?v=KoWqdEACyLI
 
 #### Real-time Multiplayer Game Tutorial with Node.js, Express, and Phaser (a Javascript game engine)
 
-Our copy of the tutorial code can be found [here](). The use of Phaser simplifies the game model and front end issues, but this is a great way to get a sense of how Node.js, Express, and Socket.io are used to send gamestate data between the server and multiple clients. The multiplayer aspects of game design add considerable complexity may help you wrap your head around it. (although it does oversimplify the front end work of drawing the game, handling physics, and synchronizing server/client latency issues)
+Our copy of the tutorial code can be found [here](https://github.com/gibboa/Open_IO/tree/master/LearningResources/IO_game_node-socket-phaser). The use of Phaser simplifies the game model and front end issues, but this is a great way to get a sense of how Node.js, Express, and Socket.io are used to send gamestate data between the server and multiple clients. The multiplayer aspects of game design add considerable complexity may help you wrap your head around it. (although it does oversimplify the front end work of drawing the game, handling physics, and synchronizing server/client latency issues)
 
 To test tutorial code, open a node command-line prompt, move to directory containing the server.js file and type "node server.js".
 A message will appear saying that the server is listening at a given port.
