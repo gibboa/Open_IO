@@ -24,8 +24,6 @@ function drawBG(pen){
 			//8. width of drawn img on canvas 9. height of drawn img on canvas
 			//(note: x, y start at 0,0 in the upper-left corner for both canvas and sprite sheet)
 			pen.drawImage(tile, 10, 0, 10, 10, x * 10, y * 10, tileLen, tileLen);
-			//pen.fillStyle = 'black';
-			//pen.fillRect(x * 10, y * 10, tileLen, tileLen);
 		}
 	}
 }
@@ -61,20 +59,18 @@ function drawScores(){
 	let tmp_array = []
 	for(var key in players) {
   		tmp_array.push(players[key]);
-  		console.log(tmp_array);
-  		console.log(players[key]);
+  		//console.log(tmp_array); //use console.log and view with developer tools in browser for debugging
+  		//console.log(players[key]);
   	}
   	//use array sort by player scores (high to low)
 	tmp_array.sort(function (a, b) {
 	  	return b.score - a.score;
 	});
-	console.log(tmp_array);
 	//draw scores from sorted array
 	let y_offset = 50;
 	let count = 1;
 	for(var i in tmp_array){
 		if(count>10){break;}
-		console.log(i);
 		pen.font = "12px Arial";
 		pen.fillStyle = "red";
 		pen.textAlighn = "center";
