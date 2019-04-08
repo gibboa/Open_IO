@@ -26,6 +26,12 @@ Some extra comments are added to help new developers understand the HTML
 	<img src="pictures/sprite_sheet.png" id="spriteSheet" style="display:none;" />
 
 	<canvas id="canvas" width="640" height="640" ></canvas> 
+
+	<!--tempory canvas for scoreboard (with the current small/fixed gameboard it would be annoying to
+		have the scoreboard on top of it so we will draw it to the right of the main canvas for now.
+		doing it as a canvas instead of html so that we can use draw functions and when we upgrade to 
+		a scrolling background we can use the same functions to draw the score on the main canvas-->)
+	<canvas id="scoreboard" width="200" height="240" ></canvas>
 	
 	<div id="game_barrier">
 		<div id="name_box">

@@ -12,6 +12,17 @@ body{
 	margin: 0 0 0 -320px;
 }
 
+#scoreboard
+{
+	position:relative;
+	left:50%;
+	width:200px;
+	height:240px;
+	background-color:#80DEEA;
+	margin: 0 0 400px -12px;
+	/*border: 2px solid black;*/
+}
+
 #game_barrier 
 {
 	position: relative;

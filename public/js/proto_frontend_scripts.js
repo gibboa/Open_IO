@@ -30,6 +30,64 @@ function drawBG(pen){
 	}
 }
 
+//Draw the scoreboard
+//currently draws on a separate canvas with id="scoreboard" 
+//later this will be drawn on the main canvas in the upper right corner
+//Args: SHOULD take players list, (later a context for main canvas)
+function drawScores(){
+	let scoreboard_canvas = $("scoreboard");
+	let pen = scoreboard_canvas.getContext("2d");
+	pen.font = "20px Arial";
+	pen.fillStyle = "red";
+	pen.textAlighn = "center";
+	pen.fillText("Leaderboard", 45, 25);
+
+	//creating fake players object for testing////////////
+	players = {
+		id1: {name: "player1", score: 1223},
+		id2: {name: "player2", score: 111},
+		id3: {name: "player3", score: 1992},
+		id4: {name: "player5", score: 123},
+		id5: {name: "player6", score: 17773},
+		id6: {name: "player7", score: 1223},
+		id7: {name: "Scrooge McDuck", score: 19999},
+		id8: {name: "player9", score: 1},
+		id9: {name: "player10", score: 1233323},
+		id10: {name: "player11", score: 323},
+		id11: {name: "player4", score: 139999}
+	}
+	//////////////////////////////////////////////////////
+	//copying player object into array for array sort
+	let tmp_array = []
+	for(var key in players) {
+  		tmp_array.push(players[key]);
+  		console.log(tmp_array);
+  		console.log(players[key]);
+  	}
+  	//use array sort by player scores (high to low)
+	tmp_array.sort(function (a, b) {
+	  	return b.score - a.score;
+	});
+	console.log(tmp_array);
+	//draw scores from sorted array
+	let y_offset = 50;
+	let count = 1;
+	for(var i in tmp_array){
+		if(count>10){break;}
+		console.log(i);
+		pen.font = "12px Arial";
+		pen.fillStyle = "red";
+		pen.textAlighn = "center";
+		let tmp_str = "#" + count.toString(10);
+		pen.fillText( tmp_str, 15, y_offset);
+		//add a way to cut off the name if it's too long
+		pen.fillText( tmp_array[i].name, 45, y_offset);
+		pen.fillText( tmp_array[i].score, 150, y_offset);
+		y_offset += 20;
+		count += 1;
+	} 
+}
+
 
 //initGame()
 //This function is called when the player clicks the Play button...
@@ -46,6 +104,7 @@ function initGame(){
 	ctx = gameboard.getContext('2d');
 
 	drawBG(ctx);
+	drawScores();
 
 	//Establishing Connection to Game Server
 	var socket = io.connect('http://localhost:8081');
