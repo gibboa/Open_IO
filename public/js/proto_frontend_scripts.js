@@ -9,6 +9,28 @@
 function $(id){return document.getElementById(id);}
 
 
+//Draw background of canvas using a tile from the style sheet
+//Args: pen, a context from the canvas object
+function drawBG(pen){
+	let tile = new Image();
+	tile.src = "pictures/sprite_sheet.png";
+	let tileLen = 10; //tile is a 10x10 square
+	let x = 0, y = 0;
+	for(x=0; x<64; x+=1){
+		for(y=0; y<64; y +=1){
+			//to use drawImage() with sprite sheet, it takes 9 args:
+			//1. imgName, 2. x of sprite cutout 3. y of sprite cutout 4. width of sprite cutout
+			//5. height of sprite cutout 6. x of canvas location 7. y of canvas location
+			//8. width of drawn img on canvas 9. height of drawn img on canvas
+			//(note: x, y start at 0,0 in the upper-left corner for both canvas and sprite sheet)
+			pen.drawImage(tile, 10, 0, 10, 10, x * 10, y * 10, tileLen, tileLen);
+			//pen.fillStyle = 'black';
+			//pen.fillRect(x * 10, y * 10, tileLen, tileLen);
+		}
+	}
+}
+
+
 //initGame()
 //This function is called when the player clicks the Play button...
 //It should begin the game for them changing the display and requesting
@@ -22,6 +44,8 @@ function initGame(){
 	gameboard = $('canvas');
 	//drawBuf is an object that will draw on our canvas
 	ctx = gameboard.getContext('2d');
+
+	drawBG(ctx);
 
 	//Establishing Connection to Game Server
 	var socket = io.connect('http://localhost:8081');
