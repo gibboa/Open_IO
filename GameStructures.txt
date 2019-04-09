@@ -1,0 +1,23 @@
+This files describes the structures used to represent the games state. Use as a references when writing code.
+
+Players_list: "Players"
+//usage: players[socket.id].name returns the name of the player with the id used as the key
+//maps socket.id to a player record which contains:
+    position_list:
+        [ x coord, y coord, time ] //top of list is head of snake ... list will be one or two longer than length
+    ID //assigned by socket.io on the server (same as key for players object)
+    name //string: what the player types in before starting the game
+    orientation //string: 'up', 'down', 'left', 'right'
+    length //int amount of body segments in snake
+    score //int
+    velocity //int
+    color //int 0,1,2...however many snake skins we have, used for selecting sprites
+    status //string 'dead', 'alive' (or however else we want to represent it, just a binary)
+
+Object: game_object
+  contains:
+      players_list
+      food_list
+      
+
+      
