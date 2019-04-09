@@ -29,7 +29,7 @@ function drawBG(pen){
 }
 
 //Draw the scoreboard
-//currently draws on a separate canvas with id="scoreboard" 
+//currently draws on a separate canvas with id="scoreboard"
 //later this will be drawn on the main canvas in the upper right corner
 //Args: SHOULD take players list, (later a context for main canvas)
 function drawScores(){
@@ -81,9 +81,41 @@ function drawScores(){
 		pen.fillText( tmp_array[i].score, 150, y_offset);
 		y_offset += 20;
 		count += 1;
-	} 
+	}
 }
 
+//=============================================================================
+// Functions that check whether the current player is colliding with either the gameboard
+// boundaries, any of the other players, or any of the food objects
+
+
+// checkCollision_Board takes a player p1 and gameboard g and returns true if p1
+// has hit the boundaries of g
+function checkCollision_Board(players p1, gameboard g) {
+	return p1.position_list[0][0] == g.x && p1.position_list[0][1] == g.y;
+}
+
+// checkCollision_Player takes two players p1 and p2 and returns true if p1 hits the hitbox of p2
+function checkCollision_Player(players p1, players p2) {
+		if (p1.position_list[0][0] == p2.position_list[0][0]-5 || p1.position_list[0][0] == p2.position_list[0][0]+5){
+			return true;
+		} else if (p1.position_list[0][1] == p2.position_list[0][1]-5 || p1.position_list[0][1] == p2.position_list[0][1]+5){
+			return true;
+		}
+	return false;
+}
+
+// checkCollision_Food takes a player p1 and a list of food objects foods and returns true if p1
+// hits any one of the the objects in foods
+function checkCollision_Food(players p1, food_list foods) {
+	for (var i = 0; i < food_list.length; i++) {
+		if (p1.position_list[0][0] == food_list[i].x && p1.position_list[0][1] == food_list[i].y){
+			return true;
+		}
+	}
+	return false;
+}
+//=============================================================================
 
 //initGame()
 //This function is called when the player clicks the Play button...
@@ -91,7 +123,7 @@ function drawScores(){
 //that the server add them to the game
 function initGame(){
 	//because this element is a text field, .value will store the users input in our variable
-    var name= $('player_name').value; 
+    var name= $('player_name').value;
     alert('hi ' + name + ' the game would be starting now if it existed');
     $('game_barrier').style.display = "none";//turns off cover that was positioned over the canvas
     //gameboard contains the <canvas> element above
@@ -134,7 +166,7 @@ function initGame(){
         socket.emit('playerMovement',{
         	input: key_code
         	//some time data may come in handy soon...
-        	//perhaps collect state changes for a given time interval and push them 
+        	//perhaps collect state changes for a given time interval and push them
         	//out at the same time, to keep everyone in sync???
         });
 
@@ -158,4 +190,3 @@ function update(){
 		//alert("received something from server to update gamestate");
 	//});
 }
-
