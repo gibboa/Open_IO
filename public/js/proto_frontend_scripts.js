@@ -92,14 +92,14 @@ function drawScores(){
 // checkCollision_Board takes a player p1 and gameboard g and returns true if p1
 // has hit the boundaries of g
 function checkCollision_Board(players p1, gameboard g) {
-	return p1.position_list[0][0] == g.x && p1.position_list[0][1] == g.y;
+	return (p1.position_list[0][0] >= g.x && p1.position_list[0][1] >= g.y) || (p1.position_list[0][0] <= 0 && p1.position_list[0][1] <= 0);
 }
 
 // checkCollision_Player takes two players p1 and p2 and returns true if p1 hits the hitbox of p2
 function checkCollision_Player(players p1, players p2) {
-		if (p1.position_list[0][0] == p2.position_list[0][0]-5 || p1.position_list[0][0] == p2.position_list[0][0]+5){
+		if (p1.position_list[0][0] >= p2.position_list[0][0]-5 && p1.position_list[0][0] <= p2.position_list[0][0]+5){
 			return true;
-		} else if (p1.position_list[0][1] == p2.position_list[0][1]-5 || p1.position_list[0][1] == p2.position_list[0][1]+5){
+		} else if (p1.position_list[0][1] >= p2.position_list[0][1]-5 || p1.position_list[0][1] <= p2.position_list[0][1]+5){
 			return true;
 		}
 	return false;
