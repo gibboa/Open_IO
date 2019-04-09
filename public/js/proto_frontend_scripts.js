@@ -8,12 +8,19 @@
 //the DOM....when you see $, realize that its calling this function
 function $(id){return document.getElementById(id);}
 
+// This client's game state
+var game = {};
 
 //initGame()
 //This function is called when the player clicks the Play button...
 //It should begin the game for them changing the display and requesting
 //that the server add them to the game
 function initGame(){
+	
+	// Create Game object on client side
+	game = new game_object();
+	
+	
 	//because this element is a text field, .value will store the users input in our variable
     var name= $('player_name').value; 
     alert('hi ' + name + ' the game would be starting now if it existed');
@@ -22,7 +29,15 @@ function initGame(){
 	gameboard = $('canvas');
 	//drawBuf is an object that will draw on our canvas
 	ctx = gameboard.getContext('2d');
-
+	
+	/**
+	// Assign ctx to game object
+	game.ctx = ctx;
+	
+    game.ctx.fillStyle = "darkorange";
+	game.ctx.fillRect(25, 25, 15, 15);
+	**/
+	
 	//Establishing Connection to Game Server
 	var socket = io.connect('http://localhost:8081');
 	socket.on('connect', function(){

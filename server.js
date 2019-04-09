@@ -12,7 +12,9 @@ var io = require('socket.io').listen(server);
 //string name --> name of player entered at game start
 //access by typing 'players[socket.id].direction'
 var players = {};
- 
+
+var game_server = {};
+
 app.use(express.static(__dirname + '/public'));
  
 app.get('/', function (req, res) {
@@ -20,6 +22,11 @@ app.get('/', function (req, res) {
 });
 
 io.on('connection', function (socket) {
+	
+	
+	game_server = require('./public/js/game_server.js');
+	
+	
   	console.log('a user connected with socket id: ' + socket.id );
   	//map user's socket id to a player object initialized with random values
 
@@ -36,7 +43,8 @@ io.on('connection', function (socket) {
   		//change name in player object
   		players[socket.id].name = data.playerName;
   		console.log('player name, ' + data.playerName + ' recieved from ' + socket.id +', updating player object');
-  		console.log('Player ' + socket.id + ' name updated to ' + players[socket.id].name);
+  		console.log('Player ' + socket.id + ' name updated to ' + players[socket.id].name + ". Socket ID: " + socket.id);
+		
 
   	});
 
@@ -49,6 +57,7 @@ io.on('connection', function (socket) {
   		//NOTE: this isnt actually movement related yet, i just want to send data
   		console.log('player', socket.id, 'changed direction to', data.input);
   		io.sockets.emit('gameStateUpdate', players[socket.id].name + "'s direction changed...");
+		
   	});
 
   	//send the players object to the new player
