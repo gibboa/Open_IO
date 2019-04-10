@@ -85,7 +85,7 @@ function drawFood(food_list,pen){
 }
 
 //Draw the scoreboard
-//currently draws on a separate canvas with id="scoreboard" 
+//currently draws on a separate canvas with id="scoreboard"
 //later this will be drawn on the main canvas in the upper right corner
 //Args: SHOULD take players list, (later a context for main canvas)
 function drawScores(){
@@ -137,7 +137,7 @@ function drawScores(){
 		pen.fillText( tmp_array[i].score, 150, y_offset);
 		y_offset += 20;
 		count += 1;
-	} 
+	}
 }
 
 
@@ -147,7 +147,7 @@ function drawScores(){
 //that the server add them to the game
 function initGame(){
 	//because this element is a text field, .value will store the users input in our variable
-    var name= $('player_name').value; 
+    var name= $('player_name').value;
     alert('hi ' + name + ' the game would be starting now if it existed');
     $('game_barrier').style.display = "none";//turns off cover that was positioned over the canvas
     //gameboard contains the <canvas> element above
@@ -190,7 +190,7 @@ function initGame(){
         socket.emit('playerMovement',{
         	input: key_code
         	//some time data may come in handy soon...
-        	//perhaps collect state changes for a given time interval and push them 
+        	//perhaps collect state changes for a given time interval and push them
         	//out at the same time, to keep everyone in sync???
         });
 
@@ -214,5 +214,3 @@ function update(){
 		//alert("received something from server to update gamestate");
 	//});
 }
-
-
