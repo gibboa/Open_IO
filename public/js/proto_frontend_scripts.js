@@ -28,6 +28,21 @@ function drawBG(pen){
 	}
 }
 
+
+function drawFood(food_list,pen){
+	let tile = new Image();
+	tile.src = "pictures/sprite_sheet.png";
+	let tileLen = 11; //tile is a 11x11 square
+	for(i=0; i<foodList.length; i+=1){
+		//to use drawFood() with sprite sheet, it takes 9 args:
+		//1. imgName, 2. x of sprite cutout 3. y of sprite cutout 4. width of sprite cutout
+		//5. height of sprite cutout 6. x of canvas location 7. y of canvas location
+		//8. width of drawn img on canvas 9. height of drawn img on canvas
+		//(note: x, y start at 0,0 in the upper-left corner for both canvas and sprite sheet)
+		pen.drawImage(tile, 0, 0, 10, 10, foodList[i].x -5, foodList[i].y -5, tileLen, tileLen);
+	}
+}
+
 //Draw the scoreboard
 //currently draws on a separate canvas with id="scoreboard" 
 //later this will be drawn on the main canvas in the upper right corner
