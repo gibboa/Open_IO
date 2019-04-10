@@ -11,16 +11,17 @@ Open IO is an online multiplayer IO snake game that uses javascript, react, node
 	![nodejs_website](images/nodejs_website.png)
 	3. Once, downloaded, double click to install.
 	4. The Node.js Setup Wizard will appear. Follow the instructions to Install.
-	![nodejs_wizard](images/nodjs_wizard.png)
+	![nodejs_wizard](images/nodejs_wizard.png)
 
 
 2. Check if successfully installed
 	**On Windows 10**
-	If successfully installed, running "node -v" in Command Prompt will show your version of Node and running "npm -v" will show you your version of npm (your version should be different than the one in the image)
+	If successfully installed, running "node -v" in Command Prompt will show your version of Node and running "npm -v" will show you your version of npm (your version should be different than the one in the image) <br/>
 	![version_windows](images/version_windows.png)
 
 	**On Mac OSX**
-	If successfully installed, running "node -v" in Terminal will show your version of Node and running "npm -v" will show you your version of npm (your version should be different than the one in the image)
+	If successfully installed, running "node -v" in Terminal will show your version of Node and running "npm -v" will show
+	your version of npm (your version should be different than the one in the image)
 	![version_mac](images/version_mac.png)
 
 
@@ -28,16 +29,16 @@ Open IO is an online multiplayer IO snake game that uses javascript, react, node
 # Setting Up (Linux)
 
 1. Get Node.js
-	**Debian, Ubuntu, Linux Mint**
+	**Debian, Ubuntu, Linux Mint** <br/>
 	$ sudo apt-get install nodejs npm
 
-	**RHEL, CentOS**
+	**RHEL, CentOS** <br/>
 	$ sudo yum install epel-release
 
-	**Fedora**
+	**Fedora** <br/>
 	$ sudo dnf install nodejs npm
 
-	**Arch Linux**
+	**Arch Linux** <br/>
 	$ sudo pacman -S nodejs npm
 
 2. Check if successfully installed.
