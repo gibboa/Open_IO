@@ -43,7 +43,7 @@ Repository: https://github.com/gibboa/Open_IO <br/>
 	**Arch Linux** <br/>
 	$ sudo pacman -S nodejs npm
 
-2. Check if successfully installed.
+2. Check if Node.js and npm are successfully installed.
 	If successfully installed, running "node -v" in Terminal will show your version of Node and running "npm -v" will show you your version of npm (your version should be different than the one in the image)
 
 
