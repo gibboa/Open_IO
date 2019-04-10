@@ -2,9 +2,9 @@
 Open IO is an online multiplayer IO snake game that uses javascript, react, Node.js, and socket.io
 
 # Resources
-Blog: https://rcos.io/projects/gibboa/open_io/blog
-Website: https://rcos.io/projects/gibboa/open_io/profile
-Repository: https://github.com/gibboa/Open_IO
+Blog: https://rcos.io/projects/gibboa/open_io/blog <br/>
+Website: https://rcos.io/projects/gibboa/open_io/profile <br/>
+Repository: https://github.com/gibboa/Open_IO <br/>
 
 # Setting Up (Windows, MacOS)
 1. Get Node.js
