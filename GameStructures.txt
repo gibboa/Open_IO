@@ -14,6 +14,13 @@ Players_list: "Players"
     color //int 0,1,2...however many snake skins we have, used for selecting sprites
     status //string 'dead', 'alive' (or however else we want to represent it, just a binary)
 
+Food_list:
+    //not necessary to have a food object but we may want to add fields later, so just in case
+    //array of Food objects:
+    x    // x coord of center of food
+    y    // y coord of cetner of food
+    //usage: food_list[0].x  returns x coord of first food in list
+
 Object: game_object
   contains:
       players_list

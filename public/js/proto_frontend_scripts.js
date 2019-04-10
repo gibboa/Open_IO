@@ -1,3 +1,4 @@
+
 /*
 *Scripts for prototype front-end of Open IO
 */
@@ -7,6 +8,46 @@
 //based on the ID passed into (which is set in the HTML) via
 //the DOM....when you see $, realize that its calling this function
 function $(id){return document.getElementById(id);}
+
+// Functions that check whether the current player is colliding with either the gameboard
+// boundaries, any of the other players, or any of the food objects
+
+function check_overlap(int x1, int y1, int x2, int y2){
+	if ( (x1+5 >= x2-5 && x1+5 <= x2+5) || (x1-5 <= x2+5 && x1+5 >= x2-5) ) {
+		if ( (y1+5 >= y2-5 && y1+5 <= y2+5) || (y1-5 <= y2+5 && y1-5 >= y2-5) ){
+			return true;
+		}
+	}
+	return false;
+}
+// checkCollision_Board takes a player p1 and gameboard g and returns true if p1
+// has hit the boundaries of g
+function checkCollision_Board(players p1, gameboard g) {
+	if (p1.position_list[0][0]+5 >= g.x || p1.position_list[0][1]+5 >= g.y) {return true;}
+	else if (p1.position_list[0][0]-5 <= 0 || p1.position_list[0][0]-5 <= 0) {return true;}
+	return false;
+}
+
+// checkCollision_Player takes two players p1 and p2 and returns true if p1 hits the hitbox of p2
+function checkCollision_Player(players p1, players p2) {
+	for (var i = 0; i < p2.position_list.length; i++) {
+		if (check_overlap(p1.position_list[0][0], p1.position_list[0][1], p2.position_list[i][0], p2.position_list[i][1]) == true){
+			return true;
+		}
+	}
+	return false;
+}
+
+// checkCollision_Food takes a player p1 and a list of food objects foods and returns true if p1
+// hits any one of the the objects in foods
+function checkCollision_Food(players p1, food_list foods) {
+	for (var i = 0; i < foods.length; i++) {
+		if (check_overlap(p1.position_list[0][0], p1.position_list[0][1], foods[i].x, foods[i].y)){
+			return true;
+		}
+	}
+	return false;
+}
 
 
 //Draw background of canvas using a tile from the style sheet
@@ -28,8 +69,23 @@ function drawBG(pen){
 	}
 }
 
+
+function drawFood(food_list,pen){
+	let tile = new Image();
+	tile.src = "pictures/sprite_sheet.png";
+	let tileLen = 11; //tile is a 11x11 square
+	for(i=0; i<foodList.length; i+=1){
+		//to use drawFood() with sprite sheet, it takes 9 args:
+		//1. imgName, 2. x of sprite cutout 3. y of sprite cutout 4. width of sprite cutout
+		//5. height of sprite cutout 6. x of canvas location 7. y of canvas location
+		//8. width of drawn img on canvas 9. height of drawn img on canvas
+		//(note: x, y start at 0,0 in the upper-left corner for both canvas and sprite sheet)
+		pen.drawImage(tile, 0, 0, 10, 10, foodList[i].x -5, foodList[i].y -5, tileLen, tileLen);
+	}
+}
+
 //Draw the scoreboard
-//currently draws on a separate canvas with id="scoreboard"
+//currently draws on a separate canvas with id="scoreboard" 
 //later this will be drawn on the main canvas in the upper right corner
 //Args: SHOULD take players list, (later a context for main canvas)
 function drawScores(){
@@ -81,50 +137,9 @@ function drawScores(){
 		pen.fillText( tmp_array[i].score, 150, y_offset);
 		y_offset += 20;
 		count += 1;
-	}
+	} 
 }
 
-//=============================================================================
-// Functions that check whether the current player is colliding with either the gameboard
-// boundaries, any of the other players, or any of the food objects
-
-function check_overlap(int x1, int y1, int x2, int y2){
-	if ( (x1+5 >= x2-5 && x1+5 <= x2+5) || (x1-5 <= x2+5 && x1+5 >= x2-5) ) {
-		if ( (y1+5 >= y2-5 && y1+5 <= y2+5) || (y1-5 <= y2+5 && y1-5 >= y2-5) ){
-			return true;
-		}
-	}
-	return false;
-}
-// checkCollision_Board takes a player p1 and gameboard g and returns true if p1
-// has hit the boundaries of g
-function checkCollision_Board(players p1, gameboard g) {
-	if (p1.position_list[0][0]+5 >= g.x || p1.position_list[0][1]+5 >= g.y) {return true;}
-	else if (p1.position_list[0][0]-5 <= 0 || p1.position_list[0][0]-5 <= 0) {return true;}
-	return false;
-}
-
-// checkCollision_Player takes two players p1 and p2 and returns true if p1 hits the hitbox of p2
-function checkCollision_Player(players p1, players p2) {
-	for (var i = 0; i < p2.position_list.length; i++) {
-		if (check_overlap(p1.position_list[0][0], p1.position_list[0][1], p2.position_list[i][0], p2.position_list[i][1]) == true){
-			return true;
-		}
-	}
-	return false;
-}
-
-// checkCollision_Food takes a player p1 and a list of food objects foods and returns true if p1
-// hits any one of the the objects in foods
-function checkCollision_Food(players p1, food_list foods) {
-	for (var i = 0; i < foods.length; i++) {
-		if (check_overlap(p1.position_list[0][0], p1.position_list[0][1], foods[i].x, foods[i].y)){
-			return true;
-		}
-	}
-	return false;
-}
-//=============================================================================
 
 //initGame()
 //This function is called when the player clicks the Play button...
@@ -132,7 +147,7 @@ function checkCollision_Food(players p1, food_list foods) {
 //that the server add them to the game
 function initGame(){
 	//because this element is a text field, .value will store the users input in our variable
-    var name= $('player_name').value;
+    var name= $('player_name').value; 
     alert('hi ' + name + ' the game would be starting now if it existed');
     $('game_barrier').style.display = "none";//turns off cover that was positioned over the canvas
     //gameboard contains the <canvas> element above
@@ -175,7 +190,7 @@ function initGame(){
         socket.emit('playerMovement',{
         	input: key_code
         	//some time data may come in handy soon...
-        	//perhaps collect state changes for a given time interval and push them
+        	//perhaps collect state changes for a given time interval and push them 
         	//out at the same time, to keep everyone in sync???
         });
 
@@ -199,3 +214,5 @@ function update(){
 		//alert("received something from server to update gamestate");
 	//});
 }
+
+
