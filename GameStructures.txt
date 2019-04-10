@@ -26,5 +26,45 @@ Object: game_object
       players_list
       food_list
       
+PSEUDOCODES
+initFood()
+//return (by any means necesary) a list of 10 foods to start with..
+//so use random number generators to produce coordinates for initial food
+//(examples can be found in proto_frontend_scripts.js)
+//This is intended to be called BEFORE anything is on the game board, so
+//dont worry about collisions with snakes
+//DO worry about collisions with the edge. So valid coords have to be at least
+//5px away from any edge of the gameboard.
+//remember food_list is a simple array, but the food objects are similar to the player
+//objects so something like food {x : value, y : value}; ... this is in case
+//we find we want to store more data associated with foods (which is likely)
+
+
+physics_update(inputs_queue, game_object) FRONT END VERSION
+//function to be called every 15ms with setinterval function
+Psuedocode:
+	1. call checkInputs() //handle all inputs in input queue, then clear it
+		--if they are direction changes, then change direction of associated player
+		--if they are are spawning/death/disconnect notices then change status of associated players
+	2. call moveSnakes() //move all snakes forward based on velocity using delta time
+	(2 1/2. incorporate authoritative update?)
+	3. call checkGameEvents() //checks for events as a result of movement
+		--run all check collision funcitons for all snakes
+		--adjust player states based on results of check collisions
+	4. call redraw function
+		--clear canvas
+		--call each individual drawing function in order
+			--draw bg
+			--draw food
+			--draw snakes
+
+physics_update(inputs_queue, game_object) BACK END VERSION
+//function to be called every 15ms with setinterval function
+Psuedocode:
+	1. handle all inputs in input queue, then clear it
+		--if they are direction changes, then change direction of associated player
+		--if they are are spawning/death notices then change status of associated players
+
+      
 
       
