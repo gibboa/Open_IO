@@ -18,7 +18,7 @@ Repository: https://github.com/gibboa/Open_IO <br/>
 
 2. Check if Node.js and npm are successfully installed. <br/>
 	**On Windows 10** <br/>
-	If successfully installed, running "node -v" in Command Prompt will show your version of Node and running "npm -v" will show you your version of npm (your version should be different than the one in the image) <br/>
+	If successfully installed, running "node -v" in Command Prompt will show your version of Node and running "npm -v" will show your version of npm (your version should be different than the one in the image) <br/>
 	![version_windows](images/version_windows.png)
 
 	**On Mac OSX** <br/>
@@ -44,7 +44,7 @@ Repository: https://github.com/gibboa/Open_IO <br/>
 	$ sudo pacman -S nodejs npm
 
 2. Check if Node.js and npm are successfully installed. <br/>
-	If successfully installed, running "node -v" in Terminal will show your version of Node and running "npm -v" will show you your version of npm (your version should be different than the one in the image)
+	If successfully installed, running "node -v" in Terminal will show your version of Node and running "npm -v" will show your version of npm (your version should be different than the one in the image)
 
 
 # Running Open IO
