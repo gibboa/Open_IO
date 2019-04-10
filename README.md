@@ -16,7 +16,7 @@ Repository: https://github.com/gibboa/Open_IO <br/>
 	![nodejs_wizard](images/nodejs_wizard.png)
 
 
-2. Check if successfully installed
+2. Check if successfully installed <br/>
 	**On Windows 10**
 	If successfully installed, running "node -v" in Command Prompt will show your version of Node and running "npm -v" will show you your version of npm (your version should be different than the one in the image) <br/>
 	![version_windows](images/version_windows.png)
