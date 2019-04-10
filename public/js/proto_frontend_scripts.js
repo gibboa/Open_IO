@@ -11,8 +11,7 @@ function $(id){return document.getElementById(id);}
 
 //Draw background of canvas using a tile from the style sheet
 //Args: pen, a context from the canvas object
-function drawBG(){
-	console.log("after")
+function drawBG(pen){
 	let tile = new Image();
 	tile.src = "pictures/sprite_sheet.png";
 	let tileLen = 10; //tile is a 10x10 square
@@ -30,12 +29,9 @@ function drawBG(){
 }
 
 
-
-function drawFood(food_list){
+function drawFood(food_list,pen){
 	let tile = new Image();
 	tile.src = "pictures/sprite_sheet.png";
-	let food_canvas = $("food");
-	let pen = food_canvas.getContext("2d");
 	let tileLen = 11; //tile is a 11x11 square
 	for(i=0; i<foodList.length; i+=1){
 		//to use drawFood() with sprite sheet, it takes 9 args:
@@ -43,11 +39,9 @@ function drawFood(food_list){
 		//5. height of sprite cutout 6. x of canvas location 7. y of canvas location
 		//8. width of drawn img on canvas 9. height of drawn img on canvas
 		//(note: x, y start at 0,0 in the upper-left corner for both canvas and sprite sheet)
-		pen.drawImage(tile, 0, 0, 11, 11, foodList[i].x, foodList[i].y, tileLen, tileLen);
+		pen.drawImage(tile, 0, 0, 10, 10, foodList[i].x -5, foodList[i].y -5, tileLen, tileLen);
 	}
 }
-
-
 
 //Draw the scoreboard
 //currently draws on a separate canvas with id="scoreboard" 

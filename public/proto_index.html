@@ -13,19 +13,32 @@ Some extra comments are added to help new developers understand the HTML
     <meta name="description" content="This will never be hosted why would you even write this?!?! 
     (This is the description that would appear in a search engine's search results)" />
     
-    <!-- The next two lines import our CSS and JS files-->
+    <!-- The next three lines import our CSS and JS files-->
 	<link rel="stylesheet" href="css/proto_style.css" type="text/css" />
 	<script src="/socket.io/socket.io.js"></script>
     <script src="js/proto_frontend_scripts.js"></script>
 </head>
 
 <body><!--body contains everything to be displayed in the display portion of the browser-->
-	<canvas id="canvas" tabindex='1'></canvas> <!--the tabindex is supposed to make the canvas focusable-->
+	
+	<!--had an issue (possibly express related) where we couldnt load the sprite sheet just from 
+		javascript but putting the img in an html tag fixed it for now-->
+	<img src="pictures/sprite_sheet.png" id="spriteSheet" style="display:none;" />
+
+	<canvas id="canvas" width="640" height="640" ></canvas> 
+
+	<!--tempory canvas for scoreboard (with the current small/fixed gameboard it would be annoying to
+		have the scoreboard on top of it so we will draw it to the right of the main canvas for now.
+		doing it as a canvas instead of html so that we can use draw functions and when we upgrade to 
+		a scrolling background we can use the same functions to draw the score on the main canvas-->)
+	<canvas id="scoreboard" width="200" height="240" ></canvas>
+	
 	<div id="game_barrier">
 		<div id="name_box">
 			<input type="text" id="player_name" value="Enter Your Name..." onfocus="this.value='';" />
 			<button id="play_button" onclick="initGame()">Play</button>
 		</div>
+	
 	</div>
 </body>
 </html>
