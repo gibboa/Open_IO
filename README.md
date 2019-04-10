@@ -1,10 +1,18 @@
 # Open IO
-Open IO is an online multiplayer IO snake game that uses javascript, react, Node.js, and socket.io
+Open IO is an online multiplayer IO snake game that uses javascript, react, Node.js, and Socket.io
 
 # Resources
 Blog: https://rcos.io/projects/gibboa/open_io/blog <br/>
 Website: https://rcos.io/projects/gibboa/open_io/profile <br/>
 Repository: https://github.com/gibboa/Open_IO <br/>
+
+# Learning javascript, react, Node.js, and Socket.io
+The Basics (Youtube Playlist): <br/> 
+https://www.youtube.com/playlist?list=PLPgx4r0FGixlivPRCBuMP0H2WPaEShrlU
+Helpful Online Multiplayer/Socket.io tutorials <br/> 
+https://hackernoon.com/how-to-build-a-multiplayer-browser-game-4a793818c29b
+https://gamedevacademy.org/create-a-basic-multiplayer-game-in-phaser-3-with-socket-io-part-1/
+http://buildnewgames.com/real-time-multiplayer/
 
 # Setting Up (Windows, MacOS)
 1. Get Node.js
@@ -54,10 +62,10 @@ Repository: https://github.com/gibboa/Open_IO <br/>
 
 2. Running Open IO
 	1. From your command line, go to the Open IO directory.
-	2. Run the command "node server.js" to start running.
-	3. You will receive the port where you can see it running. In the image below, the port is 8081
+	2. Run the command "node server.js" to start Open IO.
+	3. You will receive the port where it is viewable. In the image below, the port is 8081.
 	![port](images/port.png)
-	4. In your web browser, visit "localhost:x" where x is the port number
+	4. In your web browser, visit "localhost:x" (x is the port number).
 	![url](images/url.png)
 	5. You should now see Open IO running.
 
