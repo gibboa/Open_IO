@@ -9,10 +9,11 @@ Repository: https://github.com/gibboa/Open_IO <br/>
 # Learning javascript, react, Node.js, and Socket.io
 The Basics (Youtube Playlist): <br/> 
 https://www.youtube.com/playlist?list=PLPgx4r0FGixlivPRCBuMP0H2WPaEShrlU
+<br/>
 Helpful Online Multiplayer/Socket.io tutorials <br/> 
-https://hackernoon.com/how-to-build-a-multiplayer-browser-game-4a793818c29b
-https://gamedevacademy.org/create-a-basic-multiplayer-game-in-phaser-3-with-socket-io-part-1/
-http://buildnewgames.com/real-time-multiplayer/
+https://hackernoon.com/how-to-build-a-multiplayer-browser-game-4a793818c29b <br/>
+https://gamedevacademy.org/create-a-basic-multiplayer-game-in-phaser-3-with-socket-io-part-1/ <br/>
+http://buildnewgames.com/real-time-multiplayer/ <br/>
 
 # Setting Up (Windows, MacOS)
 1. Get Node.js
