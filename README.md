@@ -8,10 +8,10 @@ Open IO is an online multiplayer IO snake game that uses javascript, react, node
 1. Get Node.js
 	1. Visit https://nodejs.org/en/
 	2. Download Node 10.15.3 from the website.
-	![nodejs_website](images/node_js.png)
+	![nodejs_website](images/nodejs_website.png)
 	3. Once, downloaded, double click to install.
 	4. The Node.js Setup Wizard will appear. Follow the instructions to Install.
-	![nodejs_wizard](images/node_js.png)
+	![nodejs_wizard](images/nodjs_wizard.png)
 
 
 2. Check if successfully installed
