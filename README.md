@@ -30,7 +30,7 @@ Repository: https://github.com/gibboa/Open_IO <br/>
 
 # Setting Up (Linux)
 
-1. Get Node.js
+1. Get Node.js <br/>
 	**Debian, Ubuntu, Linux Mint** <br/>
 	$ sudo apt-get install nodejs npm
 
