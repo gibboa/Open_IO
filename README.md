@@ -15,6 +15,9 @@ https://hackernoon.com/how-to-build-a-multiplayer-browser-game-4a793818c29b <br/
 https://gamedevacademy.org/create-a-basic-multiplayer-game-in-phaser-3-with-socket-io-part-1/ <br/>
 http://buildnewgames.com/real-time-multiplayer/ <br/>
 
+For more detailed information (with sample code) on how to learn the technologies used in this project,
+visit out [Learning Resources](https://github.com/gibboa/Open_IO/tree/master/LearningResources) section.
+
 # Setting Up (Windows, MacOS)
 1. Get Node.js
 	1. Visit https://nodejs.org/en/
