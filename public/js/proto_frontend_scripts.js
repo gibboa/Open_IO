@@ -1,3 +1,4 @@
+
 /*
 *Scripts for prototype front-end of Open IO
 */
@@ -8,8 +9,46 @@
 //the DOM....when you see $, realize that its calling this function
 function $(id){return document.getElementById(id);}
 
-// This client's game state
-var game = {};
+// Functions that check whether the current player is colliding with either the gameboard
+// boundaries, any of the other players, or any of the food objects
+
+function check_overlap(x1, y1, x2, y2, rad){
+	if ( (x1+rad >= x2-rad && x1+rad <= x2+rad) || (x1-rad <= x2+rad && x1+rad >= x2-rad) ) {
+		if ( (y1+rad >= y2-rad && y1+rad <= y2+rad) || (y1-rad <= y2+rad && y1-rad >= y2-rad) ){
+			return true;
+		}
+	}
+	return false;
+}
+// checkCollision_Board takes a player p1 and gameboard g and returns true if p1
+// has hit the boundaries of g
+function checkCollision_Board(p1,g) {
+	if (p1.position_list[0][0]+5 >= g.x || p1.position_list[0][1]+5 >= g.y) {return true;}
+	else if (p1.position_list[0][0]-5 <= 0 || p1.position_list[0][0]-5 <= 0) {return true;}
+	return false;
+}
+
+// checkCollision_Player takes two players p1 and p2 and returns true if p1 hits the hitbox of p2
+function checkCollision_Player(p1, p2) {
+	for (var i = 0; i < p2.position_list.length; i++) {
+		if (check_overlap(p1.position_list[0][0], p1.position_list[0][1], p2.position_list[i][0], p2.position_list[i][1]) == true){
+			return true;
+		}
+	}
+	return false;
+}
+
+// checkCollision_Food takes a player p1 and a list of food objects foods and returns true if p1
+// hits any one of the the objects in foods
+function checkCollision_Food(p1, foods) {
+	for (var i = 0; i < foods.length; i++) {
+		if (check_overlap(p1.position_list[0][0], p1.position_list[0][1], foods[i].x, foods[i].y)){
+			return true;
+		}
+	}
+	return false;
+}
+
 
 //Draw background of canvas using a tile from the style sheet
 //Args: pen, a context from the canvas object
@@ -27,6 +66,21 @@ function drawBG(pen){
 			//(note: x, y start at 0,0 in the upper-left corner for both canvas and sprite sheet)
 			pen.drawImage(tile, 10, 0, 10, 10, x * 10, y * 10, tileLen, tileLen);
 		}
+	}
+}
+
+
+function drawFood(food_list,pen){
+	let tile = new Image();
+	tile.src = "pictures/sprite_sheet.png";
+	let tileLen = 11; //tile is a 11x11 square
+	for(i=0; i<foodList.length; i+=1){
+		//to use drawFood() with sprite sheet, it takes 9 args:
+		//1. imgName, 2. x of sprite cutout 3. y of sprite cutout 4. width of sprite cutout
+		//5. height of sprite cutout 6. x of canvas location 7. y of canvas location
+		//8. width of drawn img on canvas 9. height of drawn img on canvas
+		//(note: x, y start at 0,0 in the upper-left corner for both canvas and sprite sheet)
+		pen.drawImage(tile, 0, 0, 10, 10, foodList[i].x -5, foodList[i].y -5, tileLen, tileLen);
 	}
 }
 
@@ -92,11 +146,6 @@ function drawScores(){
 //It should begin the game for them changing the display and requesting
 //that the server add them to the game
 function initGame(){
-	
-	// Create Game object on client side
-	game = new game_object();
-	
-	
 	//because this element is a text field, .value will store the users input in our variable
     var name= $('player_name').value; 
     alert('hi ' + name + ' the game would be starting now if it existed');
@@ -108,7 +157,6 @@ function initGame(){
 
 	drawBG(ctx);
 	drawScores();
-
 
 	//Establishing Connection to Game Server
 	var socket = io.connect('http://localhost:8081');
@@ -152,10 +200,7 @@ function initGame(){
 	//(This works here, but doesn't work when called in update function)
     socket.on('gameStateUpdate', function(data){
 		alert('message: ' + data + ' received from server to update gamestate');
-		
 	});
-	
-	game.update(new Date().getTime());
 
 }
 
@@ -169,4 +214,3 @@ function update(){
 		//alert("received something from server to update gamestate");
 	//});
 }
-
