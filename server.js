@@ -73,7 +73,7 @@ function initSnakeLocations(/*arr,*/ length, direction/*, playersObj*/){
 //described in more detail in GameStructures.txt in repo
 var players = {};
 
-var game_server = {};
+var game_serv = {};
 
 app.use(express.static(__dirname + '/public'));
  
@@ -84,7 +84,8 @@ app.get('/', function (req, res) {
 io.on('connection', function (socket) {
 	
 	
-	game_server = require('./public/js/game_server.js');
+	//var game_server = require('./public/js/game_server.js');
+	//game_serv = new game_server();
 	
 	
   	console.log('a user connected with socket id: ' + socket.id );
@@ -133,6 +134,9 @@ io.on('connection', function (socket) {
   		//NOTE: this isnt actually movement related yet, i just want to send data
   		console.log('player', socket.id, 'changed direction to', data.input);
   		io.sockets.emit('gameStateUpdate', players[socket.id].name + "'s direction changed...");
+		
+		// Send message to game server
+		//game_serv.message("playerMovement", data);
 		
   	});
 

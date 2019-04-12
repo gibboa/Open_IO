@@ -152,7 +152,10 @@ function initGame(){
 	//(This works here, but doesn't work when called in update function)
     socket.on('gameStateUpdate', function(data){
 		alert('message: ' + data + ' received from server to update gamestate');
+		
 	});
+	
+	game.update(new Date().getTime());
 
 }
 
