@@ -68,8 +68,8 @@ function checkCollision_Food(p1, foods) {
 
 // ======================================================================================================
 function convertFood(p1, g){
-	for (var i = 0; i < p1.length; i++) {
-		var food_temp = new Food(p1.pos_list[i][0], p1.pos_list[i][1]);
+	for (var i = 0; i < p1.length; i+2) {
+		var food_temp = { x:p1.pos_list[i][0], y:p1.pos_list[i][1] };
 		g.foods.push(food_temp);
 	}
 }
@@ -91,6 +91,7 @@ function checkGameEvents(p1, g){
 	for (var i = 0; i < g.foods.length; i++) {
 		if (checkCollision_Food(p1, g.foods[i]){
 			p1.score += 10;
+      p1.length += 1;
 			g.foods.remove(g.foods[i]);
 			if (p1.direction = 'left'){
 					p1.pos_list.push((p1.pos_list[-1][0]+10, p1.pos_list[-1][1], getTime));
