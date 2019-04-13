@@ -2,8 +2,10 @@
 
 ## Pulling code
 
-Contributing to Open_IO should be done by forking the main repository and creating a new branch.
-This new branch will hold any new modifications
+Contributing to Open_IO should be done by cloning the main repository and creating a new branch.
+This branch will hold any new modifications. When ready, create a pull request on Github. Please include details on what the new code does or what issue on the issue tracker it resolves. It is possible the code will need to be reworked before being accepted.
+
+If you are unsure where to get started, issues on the issue tracker are a great way to start being involved in the project.
 
 ## Reporting Bugs
 
@@ -20,3 +22,5 @@ When reporting a bug it is important to include as much detail as possible.
 * Detail what you were doing __before the bug occured.__
 * __Include which browser and browser version you are running__
 * __Include which OS you are running__
+
+
