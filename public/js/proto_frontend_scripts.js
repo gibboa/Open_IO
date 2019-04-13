@@ -9,6 +9,27 @@
 //the DOM....when you see $, realize that its calling this function
 function $(id){return document.getElementById(id);}
 
+//Function to convert key codes to direction strings
+//Args: int keyCode
+//Returns: string containing relevant direction
+//if key is not a,w,s,d,up,down,left,right string will be empty
+function keyToDir(keyCode){
+//keyCode Reference for likely keys:
+//'w'=87, 'a'=65, 's'=83, 'd'=68, SHIFT=16, SPACE=32, 'e'=69, 'q'=81
+//UP=38, DOWN=40, LEFT=37, RIGHT=39, ENTER=13
+    switch (key_code) {
+        case 87: return('up'); break; 
+        case 83: return('down'); break; 
+        case 68: return('right'); break; 
+        case 65: return('left'); break; 
+        case 38: return('up'); break; 
+        case 40: return('down'); break; 
+        case 39: return('right'); break; 
+        case 37: return('left'); break; 
+        default: return(''); //uncomment to check other key codes
+    }
+}
+
 // Functions that check whether the current player is colliding with either the gameboard
 // boundaries, any of the other players, or any of the food objects
 
@@ -31,7 +52,7 @@ function checkCollision_Board(p1,g) {
 // checkCollision_Player takes two players p1 and p2 and returns true if p1 hits the hitbox of p2
 function checkCollision_Player(p1, p2) {
 	for (var i = 0; i < p2.position_list.length; i++) {
-		if (check_overlap(p1.position_list[0][0], p1.position_list[0][1], p2.position_list[i][0], p2.position_list[i][1]) == true){
+		if (check_overlap(p1.position_list[0][0], p1.position_list[0][1], p2.position_list[i][0], p2.position_list[i][1], 5) == true){
 			return true;
 		}
 	}
@@ -42,7 +63,7 @@ function checkCollision_Player(p1, p2) {
 // hits any one of the the objects in foods
 function checkCollision_Food(p1, foods) {
 	for (var i = 0; i < foods.length; i++) {
-		if (check_overlap(p1.position_list[0][0], p1.position_list[0][1], foods[i].x, foods[i].y)){
+		if (check_overlap(p1.position_list[0][0], p1.position_list[0][1], foods[i].x, foods[i].y, 5)){
 			return true;
 		}
 	}
@@ -140,7 +161,14 @@ function drawScores(){
 	} 
 }
 
+//creating global input queue
+//relevant array functionality:
+//unshift(): add to front (returns new length of array if you want)
+//pop(): remove from back (returns value removed)
+//length: returns length
+var inputQueue = [];
 
+var player_ID = '';//stores ID of this player assigned by server
 //initGame()
 //This function is called when the player clicks the Play button...
 //It should begin the game for them changing the display and requesting
@@ -157,7 +185,7 @@ function initGame(){
 
 	drawBG(ctx);
 	drawScores();
-
+	x= 7;
 	//Establishing Connection to Game Server
 	var socket = io.connect('http://localhost:8081');
 	socket.on('connect', function(){
@@ -168,31 +196,43 @@ function initGame(){
         });
 	});
 
+	//listen for message containing clients own ID
+	socket.on('passID', function(data){
+		player_ID = data;
+	});
+
+	//trying out main update functions that mirrors the server one as anon in set interval
+	setInterval(function(inputQueue, game){
+    
+    //1. UPDATE PLAYER DIRECTIONS BASED ON INPUTS
+    //THINK OF A WAY TO INCORPORATE AUTHORITATIVE UPDATE
+
+    //2. UPDATE PLAYER LOCATIONS BASED ON DIRECTION
+   
+    //3. UPDATE PLAYERS BASED ON GAME EVENTS (check various types of collisions)
+    //change score, aliveness, length, food locations
+
+	}, 1000/15);// call func every 15 ms
+
+
 	//setInterval calls function fiven by first arg, every x milliseconds given by second arg
 	//so: call update() 30 times a second (basically determines framerate)
-	setInterval(update, 1000/30);
+	//setInterval(update, 10000);//to add args to function, pass them as args to setInterval after the time arg
 
 	//add event listener for player input
 	//pass it an inline anon function
 	window.addEventListener('keydown', function(event) {
        	var key_code = event.keyCode;
-       	//keyCode Reference for likely keys:
-       	//'w'=87, 'a'=65, 's'=83, 'd'=68, SHIFT=16, SPACE=32, 'e'=69, 'q'=81
-       	//UP=38, DOWN=40, LEFT=37, RIGHT=39, ENTER=13
-    	switch (key_code) {
-	        case 87: alert("send up msg"); break; //move UP
-	        case 83: alert("send down msg"); break; //move DOWN
-	        case 68: alert("send right msg"); break; //move RIGHT
-	        case 65: alert("seng left msg"); break; //move LEFT
-	        //default: alert(code); //uncomment to check other key codes
-    	}
-        //attempting to send this data to server with emit
-        socket.emit('playerMovement',{
-        	input: key_code
-        	//some time data may come in handy soon...
-        	//perhaps collect state changes for a given time interval and push them 
-        	//out at the same time, to keep everyone in sync???
-        });
+        //attempting to send this data to server with emit if key was for movement
+        if(keyToDir(key_code) != ''){
+        	inputQueue.unshift([player_ID, key_code])
+        	socket.emit('playerMovement',{
+	        	input: key_code
+	        	//NOTE when caught by listener on server key_code is accessed via arg.input
+	        	//in our case the arg is called data, so data.input
+        	});
+        }
+        
 
     }, false);
 
@@ -202,12 +242,19 @@ function initGame(){
 		alert('message: ' + data + ' received from server to update gamestate');
 	});
 
+	socket.on('authoritativeUpdate', function(data){
+		//somehow update entire local gamestate with (data is the game obj here)
+		game = data;//probly need to do deep copy, doubt this works
+	});
+
 }
 
 //update has two phases:
 //	1. update gamestate data based on any changes offered by the server
 //	2. redraw game using the updated gamestate
 function update(){
+	//x = x + 10;
+	//alert("in the update" + x);
 	//DOESNT WORK HERE...might be nice if it did though... maybe a scope issue?
 	//listing for messages concerning 'gameStateUpdate'
 	//socket.on('gameStateUpdate', function(data){
