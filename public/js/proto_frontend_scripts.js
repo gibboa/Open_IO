@@ -23,15 +23,15 @@ function check_overlap(x1, y1, x2, y2, rad){
 // checkCollision_Board takes a player p1 and gameboard g and returns true if p1
 // has hit the boundaries of g
 function checkCollision_Board(p1,g) {
-	if (p1.position_list[0][0]+5 >= g.x || p1.position_list[0][1]+5 >= g.y) {return true;}
-	else if (p1.position_list[0][0]-5 <= 0 || p1.position_list[0][0]-5 <= 0) {return true;}
+	if (p1.pos_list[0][0]+5 >= g.board.x || p1.pos_list[0][1]+5 >= g.board.y) {return true;}
+	else if (p1.pos_list[0][0]-5 <= 0 || p1.pos_list[0][0]-5 <= 0) {return true;}
 	return false;
 }
 
 // checkCollision_Player takes two players p1 and p2 and returns true if p1 hits the hitbox of p2
 function checkCollision_Player(p1, p2) {
-	for (var i = 0; i < p2.position_list.length; i++) {
-		if (check_overlap(p1.position_list[0][0], p1.position_list[0][1], p2.position_list[i][0], p2.position_list[i][1], 5) == true){
+	for (var i = 0; i < p2.pos_list.length; i++) {
+		if (check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], p2.pos_list[i][0], p2.pos_list[i][1], 5) == true){
 			return true;
 		}
 	}
@@ -41,12 +41,47 @@ function checkCollision_Player(p1, p2) {
 // checkCollision_Food takes a player p1 and a list of food objects foods and returns true if p1
 // hits any one of the the objects in foods
 function checkCollision_Food(p1, foods) {
-	for (var i = 0; i < foods.length; i++) {
-		if (check_overlap(p1.position_list[0][0], p1.position_list[0][1], foods[i].x, foods[i].y, 5)){
-			return true;
+	return check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], foods.x, foods.y, 5)){
+}
+
+
+// ======================================================================================================
+function convertFood(p1, g){
+	for (var i = 0; i < p1.length; i++) {
+		var food_temp = new Food(p1.pos_list[i][0], p1.pos_list[i][1]);
+		g.foods.push(food_temp);
+	}
+}
+
+function checkGameEvents(p1, g){
+	if (checkCollision_Board(p1, g)){
+		p1.alive = false;
+		convertFood(p1,g);
+	}
+
+	for (var i = 0; i < g.players.length; i++) {
+		if (checkCollision_Player(p1,g.players[i]){
+			p1.alive = false;
+			g.players[i].score += 100;
+			convertFood(p1,g)
 		}
 	}
-	return false;
+
+	for (var i = 0; i < g.foods.length; i++) {
+		if (checkCollision_Food(p1, g.foods[i]){
+			p1.score += 10;
+			g.foods.remove(g.foods[i]);
+			if (p1.direction = 'left'){
+					p1.pos_list.push((p1.pos_list[-1][0]+10, p1.pos_list[-1][1], getTime));
+			} else if (p1.direction = 'right'){
+					p1.pos_list.push((p1.pos_list[-1][0]-10, p1.pos_list[-1][1], getTime));
+			} else if (p1.direction = 'up'){
+					p1.pos_list.push((p1.pos_list[-1][0], p1.pos_list[-1][1]-10, getTime));
+			} else if (p1.direction = 'down'){
+					p1.pos_list.push((p1.pos_list[-1][0], p1.pos_list[-1][1]+10, getTime));
+			}
+		}
+	}
 }
 
 
