@@ -111,6 +111,18 @@ function moveSnakes(game){
           //some thoughts on how to get the snake segments to follow the path of the head
           //maybe save the position whenever there is a change in direction and until you reach
           //that position, you dont change direction (every segment needs a direction)
+          //OK HERES THE PLAN
+          //currently position list is [[x,y]]
+          //it will become [[x,y,curr_direction, new_direction_set-->true/false, new_direction, turn_at_x, turn_at_y]]
+          //so if pos_list[3] is false, we dont need to worry about turning the snake
+          //1. whenever a snake turns, the turn propagates down the body,
+          //   so when the head turns, pass data to the segment behind it
+          //   pos_list[3] = true, pos_list[4] = direction curr segment is turning to
+          //   pos_list[5] = x coord where next turn takes place, pos_list[6] = y coord of next turn
+          //2. before moving a segment, IF pos_list[3]==true AND curr position x,y == turn_at x,y
+          //   THEN change the curr direction of segment to new_direction
+          //3. propagate turn back following segment if one exists
+          //3. move segment in curr direction which was just updated from the old one... 
         //}
         game.players[key].pos_list[0][0] += change_x;
         game.players[key].pos_list[0][1] += change_y;
