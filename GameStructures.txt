@@ -1,31 +1,49 @@
 This files describes the structures used to represent the games state. Use as a references when writing code.
 
-Players_list: "Players"
-//usage: players[socket.id].name returns the name of the player with the id used as the key
-//maps socket.id to a player record which contains:
-    position_list:
-        [ x coord, y coord, time ] //top of list is head of snake ... list will be one or two longer than length
-    ID //assigned by socket.io on the server (same as key for players object)
-    name //string: what the player types in before starting the game
-    orientation //string: 'up', 'down', 'left', 'right'
-    length //int amount of body segments in snake
-    score //int
-    velocity //int
-    color //int 0,1,2...however many snake skins we have, used for selecting sprites
-    status //string 'dead', 'alive' (or however else we want to represent it, just a binary)
+//Latest version of game object 
+//sample declaration
+var game = {
+    players: {},            //maps socket.id to individual player objects
+    foods: [],              //list of food objects
+    board: {x: 640, y: 640} //board object, only has x and y fields
+};
 
-Food_list:
-    //not necessary to have a food object but we may want to add fields later, so just in case
-    //array of Food objects:
-    x    // x coord of center of food
-    y    // y coord of cetner of food
-    //usage: food_list[0].x  returns x coord of first food in list
+//sample initialization of individual player objects via game object from server.js
+game.players[socket.id] = {
+      pos_list: snakeLocs,      //list of lists (inner list is [x, y, wutever else we need..])
+      playerId: socket.id,      //copy of socket.id which is the key that gets the player obj
+      name: 'Guest',            //string: name of player
+      direction: snakeDir,      //string: 'up', 'left', 'right', 'down'
+      length: snakeLen,         //int: number of body segments for player
+      score: 0,                 //int: player score
+      velocity: 1,              //int: for adjusting speed (will have to tinker with this)
+      color: //random num       //int: in range 0-number of snake skins in sprite sheet (for selecting snakes appearance)
+      alive: true               //bool: true/false ... this was a string but bool will be faster
+    };
 
-Object: game_object
-  contains:
-      players_list
-      food_list
-      
+//sample food object...may add more fields later for time or type of food
+var food = {
+    x = 250,
+    y = 250
+}
+//NOTE: food and snake position coords represent the CENTER of the object
+
+//USAGE:
+//some samples of how to use the game obj
+
+//check if player is alive:
+if(game.players[socket.id].alive)
+
+//get x coord of third food in food list
+game.foods[2].x
+
+//check snake direction
+if(game.players[socket.id].direction == 'up')
+
+//get x coord of a snakes 2nd body segment
+game.players[socket.id].pos_list[1].x
+
+
 PSEUDOCODES
 initFood()
 //return (by any means necesary) a list of 10 foods to start with..

@@ -157,7 +157,7 @@ function initGame(){
 
 	drawBG(ctx);
 	drawScores();
-
+	x= 7;
 	//Establishing Connection to Game Server
 	var socket = io.connect('http://localhost:8081');
 	socket.on('connect', function(){
@@ -170,7 +170,7 @@ function initGame(){
 
 	//setInterval calls function fiven by first arg, every x milliseconds given by second arg
 	//so: call update() 30 times a second (basically determines framerate)
-	setInterval(update, 1000/30);
+	setInterval(update, 10000);//to add args to function, pass them as args to setInterval after the time arg
 
 	//add event listener for player input
 	//pass it an inline anon function
@@ -208,6 +208,8 @@ function initGame(){
 //	1. update gamestate data based on any changes offered by the server
 //	2. redraw game using the updated gamestate
 function update(){
+	//x = x + 10;
+	//alert("in the update" + x);
 	//DOESNT WORK HERE...might be nice if it did though... maybe a scope issue?
 	//listing for messages concerning 'gameStateUpdate'
 	//socket.on('gameStateUpdate', function(data){

@@ -68,10 +68,17 @@ function initSnakeLocations(/*arr,*/ length, direction/*, playersObj*/){
   return arr;
 }
 
+
+///////////////////////Game Object Creation////////////////////////////////////
+var game = {
+    players: {},
+    foods: [],
+    board: {x: 640, y: 640} 
+};
 //players object contains the state of all connected players
 //maps socket.id to the dictionary-structy-like collection:
 //described in more detail in GameStructures.txt in repo
-var players = {};
+//var players = {};
 
 var game_serv = {};
 
@@ -100,7 +107,7 @@ io.on('connection', function (socket) {
     
     var snakeLocs = initSnakeLocations(snakeLen, snakeDir);
     
-  	players[socket.id] = {
+  	game.players[socket.id] = {
       pos_list: snakeLocs,
     	playerId: socket.id,
     	name: 'Guest', //changes on connection via 'initPlayer' message
@@ -115,13 +122,13 @@ io.on('connection', function (socket) {
 
   	socket.on('initPlayer', function(data){
   		//change name in player object
-  		players[socket.id].name = data.playerName;//data.playerName is incomeing info from client
+  		game.players[socket.id].name = data.playerName;//data.playerName is incomeing info from client
       //logs for testing:
   		console.log('player name, ' + data.playerName + ' recieved from ' + socket.id +', updating player object');
 
-  		console.log('Player ' + socket.id + ' name updated to ' + players[socket.id].name);
-		console.log(players[socket.id].name + "'s initial direction is: " + players[socket.id].direction );
-		console.log(players[socket.id].name, "location array is:", players[socket.id].pos_list);
+  		console.log('Player ' + socket.id + ' name updated to ' + game.players[socket.id].name);
+		console.log(game.players[socket.id].name + "'s initial direction is: " + game.players[socket.id].direction );
+		console.log(game.players[socket.id].name, "location array is:", game.players[socket.id].pos_list);
 
   	});
 
@@ -133,7 +140,7 @@ io.on('connection', function (socket) {
   		//upon receit, process data, and send new positions to all clients
   		//NOTE: this isnt actually movement related yet, i just want to send data
   		console.log('player', socket.id, 'changed direction to', data.input);
-  		io.sockets.emit('gameStateUpdate', players[socket.id].name + "'s direction changed...");
+  		io.sockets.emit('gameStateUpdate', game.players[socket.id].name + "'s direction changed...");
 		
 		// Send message to game server
 		//game_serv.message("playerMovement", data);
@@ -146,7 +153,7 @@ io.on('connection', function (socket) {
   	socket.on('disconnect', function () {
     	console.log('user '+ socket.id +' disconnected');
     	//remove this player from our players object
-    	delete players[socket.id];
+    	delete game.players[socket.id];
     	io.emit('disconnect', socket.id);
   	});
   
