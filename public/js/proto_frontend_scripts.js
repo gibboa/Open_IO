@@ -214,5 +214,3 @@ function update(){
 		//alert("received something from server to update gamestate");
 	//});
 }
-
-
