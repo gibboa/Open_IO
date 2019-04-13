@@ -17,7 +17,7 @@ function keyToDir(keyCode){
 //keyCode Reference for likely keys:
 //'w'=87, 'a'=65, 's'=83, 'd'=68, SHIFT=16, SPACE=32, 'e'=69, 'q'=81
 //UP=38, DOWN=40, LEFT=37, RIGHT=39, ENTER=13
-    switch (key_code) {
+    switch (keyCode) {
         case 87: return('up'); break;
         case 83: return('down'); break;
         case 68: return('right'); break;
@@ -27,6 +27,47 @@ function keyToDir(keyCode){
         case 39: return('right'); break;
         case 37: return('left'); break;
         default: return(''); //uncomment to check other key codes
+    }
+}
+
+//Function to move snake forward one unit
+//Args: reference to game object
+//Returns: none, changes made to referenced object
+//Requires: game is initialized
+function moveSnakes(game){
+    //arbitraily going to move the snake 1px...no clue how this will go
+    for(var key in game.players) {
+        let change_x = 0, change_y = 0;
+        cur_dir = game.players[key].direction
+        if(cur_dir == 'up'){//up
+            change_y = -1;
+        }else if(cur_dir == 'right'){//right
+            change_x = 1;
+        }else if(cur_dir == 'down'){//down
+            change_y = 1;
+        }else{//left
+            change_x = -1;
+        }
+        //this is where i WOULD loop through each segment position and change it but....
+        //for(let i=0; i < game.players[key].pos_list.length; i++){
+          //some thoughts on how to get the snake segments to follow the path of the head
+          //maybe save the position whenever there is a change in direction and until you reach
+          //that position, you dont change direction (every segment needs a direction)
+          //OK HERES THE PLAN
+          //currently position list is [[x,y]]
+          //it will become [[x,y,curr_direction, new_direction_set-->true/false, new_direction, turn_at_x, turn_at_y]]
+          //so if pos_list[3] is false, we dont need to worry about turning the snake
+          //1. whenever a snake turns, the turn propagates down the body,
+          //   so when the head turns, pass data to the segment behind it
+          //   pos_list[3] = true, pos_list[4] = direction curr segment is turning to
+          //   pos_list[5] = x coord where next turn takes place, pos_list[6] = y coord of next turn
+          //2. before moving a segment, IF pos_list[3]==true AND curr position x,y == turn_at x,y
+          //   THEN change the curr direction of segment to new_direction
+          //3. propagate turn back following segment if one exists
+          //3. move segment in curr direction which was just updated from the old one...
+        //}
+        game.players[key].pos_list[0][0] += change_x;
+        game.players[key].pos_list[0][1] += change_y;
     }
 }
 
@@ -197,6 +238,29 @@ function drawScores(){
 	}
 }
 
+
+//Function to draw the snake
+//Arg: positions list from player.pos_list
+function drawSnake(pen, segments){
+	let tile = new Image();
+	tile.src = "pictures/sprite_sheet.png";
+	pen.drawImage(tile, 40, 10, 10, 10, segments[0][0] - 5, segments[0][1] - 5, 11, 11);
+}
+
+//Function to redraw entire canvas at end of update loop
+//It will clear the canvas and call all needed draw functions
+//Args: none
+//Returns: none
+function redrawCanvas(pen, game){
+	pen.clearRect(0, 0, 640, 640);//clear canvas
+	drawBG(pen);
+	for(var key in game.players){
+		drawSnake(pen, game.players[key].pos_list);
+	}
+	//drawFood(game.foods, pen);
+}
+
+
 //creating global input queue
 //relevant array functionality:
 //unshift(): add to front (returns new length of array if you want)
@@ -210,9 +274,16 @@ var player_ID = '';//stores ID of this player assigned by server
 //It should begin the game for them changing the display and requesting
 //that the server add them to the game
 function initGame(){
+
+	//maybe dont need this but w/e
+	var game = {
+	    players: {},
+	    foods: [],
+	    board: {x: 640, y: 640}
+	};
 	//because this element is a text field, .value will store the users input in our variable
     var name= $('player_name').value;
-    alert('hi ' + name + ' the game would be starting now if it existed');
+    //alert('hi ' + name + ' the game would be starting now if it existed');
     $('game_barrier').style.display = "none";//turns off cover that was positioned over the canvas
     //gameboard contains the <canvas> element above
 	gameboard = $('canvas');
@@ -225,7 +296,7 @@ function initGame(){
 	//Establishing Connection to Game Server
 	var socket = io.connect('http://localhost:8081');
 	socket.on('connect', function(){
-		alert("you are connected");
+		//alert("you are connected");
 		//send the name that the player typed in before starting
 		socket.emit('initPlayer',{
         	playerName: name
@@ -235,21 +306,41 @@ function initGame(){
 	//listen for message containing clients own ID
 	socket.on('passID', function(data){
 		player_ID = data;
+		//alert("you socket id on server is:" + player_ID);
 	});
 
+	/*THIS IS CLIENT PREDICTION LOOP (similar to update loop in function)
 	//trying out main update functions that mirrors the server one as anon in set interval
 	setInterval(function(inputQueue, game){
 
     //1. UPDATE PLAYER DIRECTIONS BASED ON INPUTS
     //THINK OF A WAY TO INCORPORATE AUTHORITATIVE UPDATE
-
+    if(game){
+	    let i;
+	    let len = 0;
+	    if(inputQueue){
+	    	len = inputQueue.length;
+	    }
+	    for(i = 0; i < len; i++){
+	        let input = inputQueue.pop();//input is [socket.id, key_code]
+	        //process each input (only inputs are direction changes right now)
+	        game.players[input[0]].direction = keyToDir(input[1]);
+	    }
     //2. UPDATE PLAYER LOCATIONS BASED ON DIRECTION
 
-    //3. UPDATE PLAYERS BASED ON GAME EVENTS (check various types of collisions)
-    //change score, aliveness, length, food locations
+    	moveSnakes(game);
 
+
+	    //3. UPDATE PLAYERS BASED ON GAME EVENTS (check various types of collisions)
+	    //change score, aliveness, length, food locations
+	    //4. REDRAW BOARD
+	    //gb = $('canvas');
+		//drawBuf is an object that will draw on our canvas
+		//ctx = gb.getContext('2d');
+	    redrawCanvas(ctx, game);
+	}
 	}, 1000/15);// call func every 15 ms
-
+	*/
 
 	//setInterval calls function fiven by first arg, every x milliseconds given by second arg
 	//so: call update() 30 times a second (basically determines framerate)
@@ -259,17 +350,31 @@ function initGame(){
 	//pass it an inline anon function
 	window.addEventListener('keydown', function(event) {
        	var key_code = event.keyCode;
+       	//alert("u pressed" + key_code);
+        //attempting to send this data to server with emit if key was for movement
+        if(keyToDir(key_code) != ''){
+        	//alert("the key you just pressed is a valid movement");
+        	//inputQueue.unshift([player_ID, key_code])
+        	socket.emit('playerMovement',{
+	        	input: key_code
+	        	//NOTE when caught by listener on server key_code is accessed via arg.input
+	        	//in our case the arg is called data, so data.input
+        	});
+        }
+
+
     }, false);
 
 	//listens for gameStateUpdate message from server (just alerts for testing)
 	//(This works here, but doesn't work when called in update function)
     socket.on('gameStateUpdate', function(data){
-		alert('message: ' + data + ' received from server to update gamestate');
+		//alert('message: ' + data + ' received from server to update gamestate');
 	});
 
 	socket.on('authoritativeUpdate', function(data){
 		//somehow update entire local gamestate with (data is the game obj here)
 		game = data;//probly need to do deep copy, doubt this works
+		redrawCanvas(ctx, game);
 	});
 
 }
