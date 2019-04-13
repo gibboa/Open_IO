@@ -72,7 +72,9 @@ function initSnakeLocations(/*arr,*/ length, direction/*, playersObj*/){
 //maps socket.id to the dictionary-structy-like collection:
 //described in more detail in GameStructures.txt in repo
 var players = {};
- 
+
+var game_serv = {};
+
 app.use(express.static(__dirname + '/public'));
  
 app.get('/', function (req, res) {
@@ -80,6 +82,12 @@ app.get('/', function (req, res) {
 });
 
 io.on('connection', function (socket) {
+	
+	
+	//var game_server = require('./public/js/game_server.js');
+	//game_serv = new game_server();
+	
+	
   	console.log('a user connected with socket id: ' + socket.id );
     //on connections generate a random snake for new player
     
@@ -110,9 +118,11 @@ io.on('connection', function (socket) {
   		players[socket.id].name = data.playerName;//data.playerName is incomeing info from client
       //logs for testing:
   		console.log('player name, ' + data.playerName + ' recieved from ' + socket.id +', updating player object');
+
   		console.log('Player ' + socket.id + ' name updated to ' + players[socket.id].name);
-      console.log(players[socket.id].name + "'s initial direction is: " + players[socket.id].direction );
-      console.log(players[socket.id].name, "location array is:", players[socket.id].pos_list);
+		console.log(players[socket.id].name + "'s initial direction is: " + players[socket.id].direction );
+		console.log(players[socket.id].name, "location array is:", players[socket.id].pos_list);
+
   	});
 
   	//update all other players of the new player
@@ -124,6 +134,10 @@ io.on('connection', function (socket) {
   		//NOTE: this isnt actually movement related yet, i just want to send data
   		console.log('player', socket.id, 'changed direction to', data.input);
   		io.sockets.emit('gameStateUpdate', players[socket.id].name + "'s direction changed...");
+		
+		// Send message to game server
+		//game_serv.message("playerMovement", data);
+		
   	});
 
   	//send the players object to the new player

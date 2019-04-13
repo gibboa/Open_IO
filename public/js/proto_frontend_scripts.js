@@ -31,7 +31,7 @@ function checkCollision_Board(p1,g) {
 // checkCollision_Player takes two players p1 and p2 and returns true if p1 hits the hitbox of p2
 function checkCollision_Player(p1, p2) {
 	for (var i = 0; i < p2.position_list.length; i++) {
-		if (check_overlap(p1.position_list[0][0], p1.position_list[0][1], p2.position_list[i][0], p2.position_list[i][1]) == true){
+		if (check_overlap(p1.position_list[0][0], p1.position_list[0][1], p2.position_list[i][0], p2.position_list[i][1], 5) == true){
 			return true;
 		}
 	}
@@ -42,7 +42,7 @@ function checkCollision_Player(p1, p2) {
 // hits any one of the the objects in foods
 function checkCollision_Food(p1, foods) {
 	for (var i = 0; i < foods.length; i++) {
-		if (check_overlap(p1.position_list[0][0], p1.position_list[0][1], foods[i].x, foods[i].y)){
+		if (check_overlap(p1.position_list[0][0], p1.position_list[0][1], foods[i].x, foods[i].y, 5)){
 			return true;
 		}
 	}
