@@ -1,4 +1,4 @@
-This files describes the structures used to represent the games state. Use as a references when writing code.
+This files describes the structures used to represent the games state. Use as a reference when writing code.
 
 //Latest version of game object 
 //sample declaration
@@ -27,8 +27,8 @@ game.players[socket.id] = {
 
 //sample food object...may add more fields later for time or type of food
 var food = {
-    x = 250,
-    y = 250
+    x : 250,
+    y : 250
 }
 //NOTE: food and snake position coords represent the CENTER of the object
 

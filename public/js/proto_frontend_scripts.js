@@ -150,6 +150,7 @@ function drawFood(food_list,pen){
 //currently draws on a separate canvas with id="scoreboard" 
 //later this will be drawn on the main canvas in the upper right corner
 //Args: SHOULD take players list, (later a context for main canvas)
+//ASSUMING use of global game object as of 4/13, indefinately...
 function drawScores(){
 	let scoreboard_canvas = $("scoreboard");
 	let pen = scoreboard_canvas.getContext("2d");
@@ -157,7 +158,7 @@ function drawScores(){
 	pen.fillStyle = "red";
 	pen.textAlighn = "center";
 	pen.fillText("Leaderboard", 45, 25);
-
+	if(!game){return;}//game must be initialized
 	//creating fake players object for testing////////////
 	players = {
 		id1: {name: "player1", score: 1223},
@@ -175,8 +176,8 @@ function drawScores(){
 	//////////////////////////////////////////////////////
 	//copying player object into array for array sort
 	let tmp_array = []
-	for(var key in players) {
-  		tmp_array.push(players[key]);
+	for(var key in game.players) {
+  		tmp_array.push(game.players[key]);
   		//console.log(tmp_array); //use console.log and view with developer tools in browser for debugging
   		//console.log(players[key]);
   	}
@@ -222,6 +223,10 @@ function redrawCanvas(pen, game){
 		drawSnake(pen, game.players[key].pos_list);
 	}
 	//drawFood(game.foods, pen);
+	let scoreboard_canvas = $("scoreboard");
+	let scoreboard_pen = scoreboard_canvas.getContext("2d");
+	scoreboard_pen.clearRect(0, 0, 200, 240);//clear scoreboard
+	drawScores();
 }
 
 
