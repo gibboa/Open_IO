@@ -19,6 +19,10 @@ game.players[socket.id] = {
       velocity: 1,              //int: for adjusting speed (will have to tinker with this)
       color: //random num       //int: in range 0-number of snake skins in sprite sheet (for selecting snakes appearance)
       alive: true               //bool: true/false ... this was a string but bool will be faster
+      path: [[x,y]]             //list of lists of coords, a pixel by pixel path which segments must 
+                                //travel along as they move
+      paht_len: (length*6)+6    //max number of coords we need to store in path... increase by 6 whenever 
+                                //the snake grows
     };
 
 //sample food object...may add more fields later for time or type of food

@@ -11,7 +11,7 @@ function keyToDir(keyCode){
 //keyCode Reference for likely keys:
 //'w'=87, 'a'=65, 's'=83, 'd'=68, SHIFT=16, SPACE=32, 'e'=69, 'q'=81
 //UP=38, DOWN=40, LEFT=37, RIGHT=39, ENTER=13
-    switch (key_code) {
+    switch (keyCode) {
         case 87: return('up'); break; 
         case 83: return('down'); break; 
         case 68: return('right'); break; 
@@ -88,11 +88,50 @@ function initSnakeLocations(/*arr,*/ length, direction/*, playersObj*/){
   return arr;
 }
 
+//Function to create initial path for snake's body segments
+//Requires: snakes pos_list has been initialized
+//Args: snake length, direction, pos_list of snake
+//Returns: array of coords (a path the snake as traveled and which
+//body segments must travel to follow the head)
+function initPath(length, dir, arr){
+  var tmp_path = [];
+  let i;
+  let px_len = (length * 6) + 1; //should be 25 with 4 segment length
+  //start by storing head in x,y and adding to path
+  let x = arr[0][0];
+  let y = arr[0][1];
+  tmp_path.push([x,y]);
+  for(i=1; i<px_len; i++){
+    //generating points points based on direction, points are 1 px apart
+    switch (dir) {
+      case 'up': 
+        y = y - 1;
+        tmp_path.push([x,y]);
+        break;
+      case 'right': 
+        x = x + 1;
+        tmp_path.push([x,y]);
+        break;
+      case 'down': 
+        y = y + 1;
+        tmp_path.push([x,y]);
+        break;
+      case 'left': 
+        x = x - 1;
+        tmp_path.push([x,y]);
+        break;   
+      }
+    }
+    //theoretical assert(tmp_path.length == 25)
+    return tmp_path;
+}
+
 //Function to move snake forward one unit
 //Args: reference to game object
 //Returns: none, changes made to referenced object
 //Requires: game is initialized
-function moveSnakes(game){
+//function moveSnakes(game){
+function moveSnakes(){
     //arbitraily going to move the snake 1px...no clue how this will go
     for(var key in game.players) {
         let change_x = 0, change_y = 0;
@@ -106,8 +145,24 @@ function moveSnakes(game){
         }else{//left
             change_x = -1;
         }
-        //this is where i WOULD loop through each segment position and change it but....
-        //for(let i=0; i < game.players[key].pos_list.length; i++){
+
+        game.players[key].pos_list[0][0] += change_x;
+        game.players[key].pos_list[0][1] += change_y;
+        //push new loc to front of path queue
+        game.players[key].path.unshift([game.players[key].pos_list[0][0],game.players[key].pos_list[0][1]]);
+        
+        //loop through segment coords and get new coord off path
+        for(let i=1; i < game.players[key].length; i++){
+            game.players[key].pos_list[i][0] = game.players[key].path[i*6][0];
+            game.players[key].pos_list[i][1] = game.players[key].path[i*6][1];
+        }
+
+        if(game.players[key].path.length > game.players[key].path_len){
+          //we dont need to store extra coords until another segment is add
+          //which means we have enough room to add a segment if needed
+          game.players[key].path.pop();//so pop last value
+        }
+          //DONT HAVE TO DO NE OF THIS NEMORE BAHAHAHAHAHAHAA...
           //some thoughts on how to get the snake segments to follow the path of the head
           //maybe save the position whenever there is a change in direction and until you reach
           //that position, you dont change direction (every segment needs a direction)
@@ -123,9 +178,6 @@ function moveSnakes(game){
           //   THEN change the curr direction of segment to new_direction
           //3. propagate turn back following segment if one exists
           //3. move segment in curr direction which was just updated from the old one... 
-        //}
-        game.players[key].pos_list[0][0] += change_x;
-        game.players[key].pos_list[0][1] += change_y;
     }
 }
 
@@ -160,31 +212,41 @@ var update_count = 0; //global var to trigger authoritative updates
 //gamestate is update every 15ms, but we will only send updates every 45 ms
 //so this counter will be used to trigger updates every three runs
 
+
 //attempting to write game loop in a setInterval func... 
-setInterval(function(inputQueue, game){
+//setInterval(function(inputQueue, game){
+setInterval(function(){
+  console.log("in the udpate loop" + " the counter is " + update_count);
     //NOTE: node is not multithreaded so the queue is safe within the scope of this function
-    
-    //1. UPDATE PLAYER DIRECTIONS BASED ON INPUTS
-    let i;
-    let len = inputQueue.length;
-    for(i = 0; i < len; i++){
-        let input = inputQueue.pop();//input is [socket.id, key_code]
-        //process each input (only inputs are direction changes right now)
-        game.players[input[0]].direction = keyToDir(input[1]);
-    }
+    if(game){
+      console.log("game is set");
+         //1. UPDATE PLAYER DIRECTIONS BASED ON INPUTS
+        let i;
+        let len = 0;
+        if(game.players){
+            len = inputQueue.length;
+        }
+        for(i = 0; i < len; i++){
+          console.log("we must have had an input");
+            let input = inputQueue.pop();//input is [socket.id, key_code]
+            //process each input (only inputs are direction changes right now)
+            game.players[input[0]].direction = keyToDir(input[1]);
+        }
 
-    //2. UPDATE PLAYER LOCATIONS BASED ON DIRECTION
-    moveSnakes(game);
+        //2. UPDATE PLAYER LOCATIONS BASED ON DIRECTION
+        //moveSnakes(game);
+        moveSnakes();
 
-    //3. UPDATE PLAYERS BASED ON GAME EVENTS (check various types of collisions)
-    //change score, aliveness, length, food locations
+        //3. UPDATE PLAYERS BASED ON GAME EVENTS (check various types of collisions)
+        //change score, aliveness, length, food locations
 
-    update_count++;//we want three updates per emit so heres where we track it
-    if(update_count == 3){
-        //emit new current authoritative gamestate (by sending entire game object?)
-        io.sockets.emit('authoritativeUpdate', game);
-        update_count = 0;
-    }
+        update_count++;//we want three updates per emit so heres where we track it
+        if(update_count == 3){
+            //emit new current authoritative gamestate (by sending entire game object?)
+            io.sockets.emit('authoritativeUpdate', game);
+            update_count = 0;
+        }
+    } 
 
 }, 1000/15);// call func every 15 ms
 
@@ -205,13 +267,13 @@ io.on('connection', function (socket) {
     
     snakeLen = 4;//set initial length to whatever we want
     
-    //building intital array of snake locations
-    
     //first pick a direction at random:
     var snakeDir = initSnakeDirection();
     
-    var snakeLocs = initSnakeLocations(snakeLen, snakeDir);
+    var snakeLocs = initSnakeLocations(snakeLen, snakeDir);//building intital array of snake locations
     
+    var snakePath = initPath(snakeLen, snakeDir, snakeLocs);//building intital path for segments to follow
+
   	game.players[socket.id] = {
       pos_list: snakeLocs,
     	playerId: socket.id,
@@ -222,8 +284,13 @@ io.on('connection', function (socket) {
       velocity: 1, //dont know what to put for this yet
       //Here color will be a random int, and there are 3 colors on the sprite sheet
       color: Math.floor(Math.random() * Math.floor(3)), //0,1,or 2... can change how we do this
-      status: true
+      status: true,
+      path: snakePath,
+      path_len: 25
   	};
+     if(game){
+        console.log("THE GAME IS SET IN THE INIT FUNCTION");
+      }
 
   	socket.on('initPlayer', function(data){//initPlayer emitted after player recieves CONNACK
   		//change name in player object
@@ -244,8 +311,8 @@ io.on('connection', function (socket) {
   	socket.on('playerMovement', function(data){
   		//naive implementation would just send updated gamestate to all players right here
       //test code:
-  		//console.log('player', socket.id, 'changed direction to', data.input);
-  		//io.sockets.emit('gameStateUpdate', game.players[socket.id].name + "'s direction changed...");
+  		console.log('player', socket.id, 'changed direction to', data.input);
+  		io.sockets.emit('gameStateUpdate', game.players[socket.id].name + "'s direction changed...");
 		
       inputQueue.unshift([socket.id, data.input]);//data.input is a number (key code)
 
