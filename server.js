@@ -3,6 +3,78 @@ var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io').listen(server);
 
+
+// Functions that check whether the current player is colliding with either the gameboard
+// boundaries, any of the other players, or any of the food objects
+
+function check_overlap(x1, y1, x2, y2, rad){
+  if ( (x1+rad >= x2-rad && x1+rad <= x2+rad) || (x1-rad <= x2+rad && x1+rad >= x2-rad) ) {
+    if ( (y1+rad >= y2-rad && y1+rad <= y2+rad) || (y1-rad <= y2+rad && y1-rad >= y2-rad) ){
+      return true;
+    }
+  }
+  return false;
+}
+// checkCollision_Board takes a player p1 and gameboard g and returns true if p1
+// has hit the boundaries of g
+function checkCollision_Board(p1,g) {
+  if (p1.pos_list[0][0]+5 >= g.board.x || p1.pos_list[0][1]+5 >= g.board.y) {return true;}
+  else if (p1.pos_list[0][0]-5 <= 0 || p1.pos_list[0][0]-5 <= 0) {return true;}
+  return false;
+}
+
+// checkCollision_Player takes two players p1 and p2 and returns true if p1 hits the hitbox of p2
+function checkCollision_Player(p1, p2) {
+  for (var i = 0; i < p2.pos_list.length; i++) {
+    if (check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], p2.pos_list[i][0], p2.pos_list[i][1], 5) == true){
+      return true;
+    }
+  }
+  return false;
+}
+
+// checkCollision_Food takes a player p1 and a list of food objects foods and returns true if p1
+// hits any one of the the objects in foods
+function checkCollision_Food(p1, foods) {
+  return check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], foods.x, foods.y, 5);
+}
+
+
+// ======================================================================================================
+function convertFood(p1, g){
+  for (var i = 0; i < p1.length; i+2) {
+    var food_temp = { x:p1.pos_list[i][0], y:p1.pos_list[i][1] };
+    g.foods.push(food_temp);
+  }
+}
+
+function checkGameEvents(p1, g){
+  if (checkCollision_Board(p1, g)){
+    p1.alive = false;
+    convertFood(p1,g);
+  }
+
+  for (var i = 0; i < g.players.length; i++) {
+    if (checkCollision_Player(p1,g.players[i])){
+      p1.alive = false;
+      g.players[i].score += 100;
+      convertFood(p1,g)
+    }
+  }
+
+  for (var i = 0; i < g.foods.length; i++) {
+    if (checkCollision_Food(p1, g.foods[i])){
+      p1.score += 10;
+      g.foods.splice(i, 1);
+      p1.path_len += 6;
+      p1.pos_list.push([p1.path[p1.length*6][0], p1.path[p1.length*6][1]]);
+      p1.length += 1;
+      addFood(g.foods);
+    }
+  }
+}
+
+
 //Function to convert key codes to direction strings
 //Args: int keyCode
 //Returns: string containing relevant direction
@@ -39,6 +111,67 @@ function initSnakeDirection(){
   return dir;
 }
 
+//Function to randomly select color/skin of snake
+//Returns an int 1,2,3 since there are only three skins right now
+//Args: none
+function initColor(){
+  return Math.floor(Math.random() * Math.floor(3)) + 1 
+}
+
+
+//Function to add a single food after one has been eaten
+//Args: food list
+//Returns: none
+//Modifies: food list
+function addFood(f){
+  let locationsNotValidated = true;
+  while(locationsNotValidated){
+    let fx = Math.floor(Math.random() * 628) + 6; //current board is 640px X 640px so
+    let fy = Math.floor(Math.random() * 628) + 6; //place player randomly between 160px-480px
+    let currFoodValid = true
+    for(let i=0; i<f.length; i++){
+      if(check_overlap(fx, fy, f[i].x, f[i].y, 6)){
+        currFoodValid = false;
+      }
+    }
+    if(currFoodValid){
+      f.push({x:fx, y:fy}); 
+    }
+    if(f.length >= 10){
+      locationsNotValidated = false;
+    }
+  }
+}
+
+//Function to initialize a list of 10 foods when games starts
+//Food will be within 6px of the edge and will not overlap with 
+//any other food
+//Args: (game) but going global to be safe
+//Returns:
+//Modifies: game.foods
+function initFoods(g){
+  var arr = [];
+  let locationsNotValidated = true;
+  while(locationsNotValidated){
+    let fx = Math.floor(Math.random() * 628) + 6; //current board is 640px X 640px so
+    let fy = Math.floor(Math.random() * 628) + 6; //place player randomly between 160px-480px
+    let currFoodValid = true
+    for(let i=0; i<arr.length; i++){
+      if(check_overlap(fx, fy, arr[i].x, arr[i].y, 6)){
+        currFoodValid = false;
+      }
+    }
+    if(currFoodValid){
+      arr.push({x:fx, y:fy}); 
+    }
+    if(arr.length >= 10){
+      locationsNotValidated = false;
+    }
+  }
+  g.foods = arr;
+}
+
+
 //Function to generate initial array of locations for a snake
 //as well as the initial direction of the snake at random
 //Args: desired start length of snake, players list to check for
@@ -61,7 +194,7 @@ function initSnakeLocations(/*arr,*/ length, direction/*, playersObj*/){
     let i;
     for(i=1; i<length; i++){
       //generating points points based on direction, points are 5 px apart
-      let offset = i*5;
+      let offset = i*6;
       switch (direction) {
         case 'up': tmp_arr.push( [ x, (y+offset) ] ); break;
         case 'right': tmp_arr.push( [ (x-offset), y ] ); break;
@@ -188,6 +321,8 @@ var game = {
     foods: [],
     board: {x: 640, y: 640} 
 };
+
+initFoods(game);
 //players object contains the state of all connected players
 //maps socket.id to the dictionary-structy-like collection:
 //described in more detail in GameStructures.txt in repo
@@ -213,13 +348,14 @@ var update_count = 0; //global var to trigger authoritative updates
 //so this counter will be used to trigger updates every three runs
 
 
+
 //attempting to write game loop in a setInterval func... 
 //setInterval(function(inputQueue, game){
 setInterval(function(){
-  console.log("in the udpate loop" + " the counter is " + update_count);
+  //console.log("in the udpate loop" + " the counter is " + update_count);
     //NOTE: node is not multithreaded so the queue is safe within the scope of this function
     if(game){
-      console.log("game is set");
+      //console.log("game is set");
          //1. UPDATE PLAYER DIRECTIONS BASED ON INPUTS
         let i;
         let len = 0;
@@ -227,7 +363,7 @@ setInterval(function(){
             len = inputQueue.length;
         }
         for(i = 0; i < len; i++){
-          console.log("we must have had an input");
+          //console.log("we must have had an input");
             let input = inputQueue.pop();//input is [socket.id, key_code]
             //process each input (only inputs are direction changes right now)
             game.players[input[0]].direction = keyToDir(input[1]);
@@ -239,11 +375,16 @@ setInterval(function(){
 
         //3. UPDATE PLAYERS BASED ON GAME EVENTS (check various types of collisions)
         //change score, aliveness, length, food locations
-
+        for(var id in game.players){
+          checkGameEvents(game.players[id], game);
+        }
+        
+        //THIS IS IMPORTANT But i want to speed it up w/o breaking stuff, temporarily moving emit out of if
+        io.sockets.emit('authoritativeUpdate', game);
         update_count++;//we want three updates per emit so heres where we track it
         if(update_count == 3){
             //emit new current authoritative gamestate (by sending entire game object?)
-            io.sockets.emit('authoritativeUpdate', game);
+            //io.sockets.emit('authoritativeUpdate', game);
             update_count = 0;
         }
     } 
@@ -283,7 +424,7 @@ io.on('connection', function (socket) {
       score: 0,
       velocity: 1, //dont know what to put for this yet
       //Here color will be a random int, and there are 3 colors on the sprite sheet
-      color: Math.floor(Math.random() * Math.floor(3)), //0,1,or 2... can change how we do this
+      color: initColor(),
       status: true,
       path: snakePath,
       path_len: 25

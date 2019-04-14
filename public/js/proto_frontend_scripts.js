@@ -103,7 +103,7 @@ function checkCollision_Player(p1, p2) {
 // checkCollision_Food takes a player p1 and a list of food objects foods and returns true if p1
 // hits any one of the the objects in foods
 function checkCollision_Food(p1, foods) {
-	return check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], foods.x, foods.y, 5)){
+	return check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], foods.x, foods.y, 5);
 }
 
 
@@ -122,7 +122,7 @@ function checkGameEvents(p1, g){
 	}
 
 	for (var i = 0; i < g.players.length; i++) {
-		if (checkCollision_Player(p1,g.players[i]){
+		if (checkCollision_Player(p1,g.players[i])){
 			p1.alive = false;
 			g.players[i].score += 100;
 			convertFood(p1,g)
@@ -130,20 +130,13 @@ function checkGameEvents(p1, g){
 	}
 
 	for (var i = 0; i < g.foods.length; i++) {
-		if (checkCollision_Food(p1, g.foods[i]){
-			p1.score += 10;
-      p1.length += 1;
-			g.foods.remove(g.foods[i]);
-			if (p1.direction = 'left'){
-					p1.pos_list.push((p1.pos_list[-1][0]+10, p1.pos_list[-1][1], getTime));
-			} else if (p1.direction = 'right'){
-					p1.pos_list.push((p1.pos_list[-1][0]-10, p1.pos_list[-1][1], getTime));
-			} else if (p1.direction = 'up'){
-					p1.pos_list.push((p1.pos_list[-1][0], p1.pos_list[-1][1]-10, getTime));
-			} else if (p1.direction = 'down'){
-					p1.pos_list.push((p1.pos_list[-1][0], p1.pos_list[-1][1]+10, getTime));
-			}
-		}
+		if (checkCollision_Food(p1, g.foods[i])){
+		    p1.score += 10;
+		    g.foods.splice(i, 1);
+		    p1.path_len += 6;
+		    p1.pos_list.push([p1.path[p1.length*6][0], p1.path[p1.length*6][1]]);
+		    p1.length += 1;
+    	}	
 	}
 }
 
@@ -168,7 +161,7 @@ function drawBG(pen){
 }
 
 
-function drawFood(food_list,pen){
+function drawFood(foodList,pen){
 	let tile = new Image();
 	tile.src = "pictures/sprite_sheet.png";
 	let tileLen = 11; //tile is a 11x11 square
@@ -187,14 +180,14 @@ function drawFood(food_list,pen){
 //later this will be drawn on the main canvas in the upper right corner
 //Args: SHOULD take players list, (later a context for main canvas)
 //ASSUMING use of global game object as of 4/13, indefinately...
-function drawScores(){
+function drawScores(g){
 	let scoreboard_canvas = $("scoreboard");
 	let pen = scoreboard_canvas.getContext("2d");
 	pen.font = "20px Arial";
 	pen.fillStyle = "red";
 	pen.textAlighn = "center";
 	pen.fillText("Leaderboard", 45, 25);
-	if(!game){return;}//game must be initialized
+	if(!g){return;}//game must be initialized
 	//creating fake players object for testing////////////
 	players = {
 		id1: {name: "player1", score: 1223},
@@ -212,8 +205,8 @@ function drawScores(){
 	//////////////////////////////////////////////////////
 	//copying player object into array for array sort
 	let tmp_array = []
-	for(var key in game.players) {
-  		tmp_array.push(game.players[key]);
+	for(var key in g.players) {
+  		tmp_array.push(g.players[key]);
   		//console.log(tmp_array); //use console.log and view with developer tools in browser for debugging
   		//console.log(players[key]);
   	}
@@ -228,7 +221,7 @@ function drawScores(){
 		if(count>10){break;}
 		pen.font = "12px Arial";
 		pen.fillStyle = "red";
-		pen.textAlighn = "center";
+		//pen.textAlign = "center";
 		let tmp_str = "#" + count.toString(10);
 		pen.fillText( tmp_str, 15, y_offset);
 		//add a way to cut off the name if it's too long
@@ -239,13 +232,32 @@ function drawScores(){
 	}
 }
 
-
 //Function to draw the snake
 //Arg: positions list from player.pos_list
-function drawSnake(pen, segments){
+function drawSnake(pen, player){
 	let tile = new Image();
 	tile.src = "pictures/sprite_sheet.png";
-	pen.drawImage(tile, 40, 10, 10, 10, segments[0][0] - 5, segments[0][1] - 5, 11, 11);
+	let offset = player.color*10;
+	//draw back to front
+	for(let i=player.pos_list.length-1; i>=1; i--){
+		pen.drawImage(tile, 40, offset, 10, 10, player.pos_list[i][0] - 5, player.pos_list[i][1] - 5, 11, 11);
+	}
+
+	switch (player.direction){
+		case 'up':
+			pen.drawImage(tile, 0, offset, 10, 10, player.pos_list[0][0] - 5, player.pos_list[0][1] - 5, 11, 11);
+			break;
+		case 'right':
+			pen.drawImage(tile, 10, offset, 10, 10, player.pos_list[0][0] - 5, player.pos_list[0][1] - 5, 11, 11);
+			break;
+		case 'down':
+			pen.drawImage(tile, 20, offset, 10, 10, player.pos_list[0][0] - 5, player.pos_list[0][1] - 5, 11, 11);
+			break;
+		case 'left':
+			pen.drawImage(tile, 30, offset, 10, 10, player.pos_list[0][0] - 5, player.pos_list[0][1] - 5, 11, 11);
+			break;
+	}
+	
 }
 
 //Function to redraw entire canvas at end of update loop
@@ -256,13 +268,13 @@ function redrawCanvas(pen, game){
 	pen.clearRect(0, 0, 640, 640);//clear canvas
 	drawBG(pen);
 	for(var key in game.players){
-		drawSnake(pen, game.players[key].pos_list);
+		drawSnake(pen, game.players[key]);
 	}
-	//drawFood(game.foods, pen);
+	drawFood(game.foods, pen);
 	let scoreboard_canvas = $("scoreboard");
 	let scoreboard_pen = scoreboard_canvas.getContext("2d");
 	scoreboard_pen.clearRect(0, 0, 200, 240);//clear scoreboard
-	drawScores();
+	drawScores(game);
 }
 
 
