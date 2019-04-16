@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Open IO
 Open IO is an online multiplayer IO snake game that uses javascript, react, Node.js, and Socket.io
 
@@ -72,9 +73,3 @@ visit out [Learning Resources](https://github.com/gibboa/Open_IO/tree/master/Lea
 	4. In your web browser, visit "localhost:x" (x is the port number).
 	![url](images/url.png)
 	5. You should now see Open IO running.
-
-
-
-
-
-
