@@ -23,6 +23,17 @@ body{
 	/*border: 2px solid black;*/
 }
 
+#boost
+{
+	position:relative;
+	left:50%;
+	width:80px;
+	height:200px;
+	background-color:#80DEEA;
+	margin: 0 0 0px 0px;
+	border: 2px solid black;
+}
+
 #game_barrier 
 {
 	position: relative;

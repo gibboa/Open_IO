@@ -74,9 +74,9 @@ function moveSnakes(game){
 // Functions that check whether the current player is colliding with either the gameboard
 // boundaries, any of the other players, or any of the food objects
 
-function check_overlap(x1, y1, x2, y2, rad){
-	if ( (x1+rad >= x2-rad && x1+rad <= x2+rad) || (x1-rad <= x2+rad && x1+rad >= x2-rad) ) {
-		if ( (y1+rad >= y2-rad && y1+rad <= y2+rad) || (y1-rad <= y2+rad && y1-rad >= y2-rad) ){
+function check_overlap(x1, y1, x2, y2, rad1, rad2){
+	if ( (x1+rad1 >= x2-rad2 && x1+rad1 <= x2+rad2) || (x1-rad1 <= x2+rad2 && x1+rad1 >= x2-rad2) ) {
+		if ( (y1+rad1 >= y2-rad2 && y1+rad1 <= y2+rad2) || (y1-rad1 <= y2+rad2 && y1-rad1 >= y2-rad2) ){
 			return true;
 		}
 	}
@@ -93,7 +93,7 @@ function checkCollision_Board(p1,g) {
 // checkCollision_Player takes two players p1 and p2 and returns true if p1 hits the hitbox of p2
 function checkCollision_Player(p1, p2) {
 	for (var i = 0; i < p2.pos_list.length; i++) {
-		if (check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], p2.pos_list[i][0], p2.pos_list[i][1], 5) == true){
+		if (check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], p2.pos_list[i][0], p2.pos_list[i][1], 5,5) == true){
 			return true;
 		}
 	}
@@ -103,7 +103,7 @@ function checkCollision_Player(p1, p2) {
 // checkCollision_Food takes a player p1 and a list of food objects foods and returns true if p1
 // hits any one of the the objects in foods
 function checkCollision_Food(p1, foods) {
-	return check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], foods.x, foods.y, 5);
+	return check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], foods.x, foods.y, 5,5);
 }
 
 
