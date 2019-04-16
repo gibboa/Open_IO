@@ -42,14 +42,18 @@ function checkCollision_Food(p1, foods) {
 
 // ======================================================================================================
 function convertFood(p1, g){
-  for (var i = 0; i < p1.length; i+2) {
+    //console.log("p1.length: " + p1.length + "\n");
+  for (var i = 0; i < p1.length; i+=2) {
+      //console.log("i: " + i);
     var food_temp = { x:p1.pos_list[i][0], y:p1.pos_list[i][1] };
     g.foods.push(food_temp);
   }
+  //console.log("\n");
 }
 
 function checkGameEvents(p1, g){
-  if (checkCollision_Board(p1, g)){
+  if (checkCollision_Board(p1, g)) {
+      console.log("q\n");
     p1.alive = false;
     convertFood(p1,g);
   }
@@ -67,6 +71,9 @@ function checkGameEvents(p1, g){
       p1.score += 10;
       g.foods.splice(i, 1);
       p1.path_len += 6;
+      console.log("p1.length: " + p1.length + " * 6 = " + (p1.path[p1.length*6]));
+      console.log("p1.path[p1.length*6][0]: " + p1.path[p1.length*6][0]);
+      //console.log("p1.path: " + p1.path);
       p1.pos_list.push([p1.path[p1.length*6][0], p1.path[p1.length*6][1]]);
       p1.length += 1;
       addFood(g.foods);
@@ -279,8 +286,8 @@ function moveSnakes(){
             change_x = -1;
         }
 
-        game.players[key].pos_list[0][0] += change_x;
-        game.players[key].pos_list[0][1] += change_y;
+        game.players[key].pos_list[0][0] += change_x * 2;
+        game.players[key].pos_list[0][1] += change_y * 2;
         //push new loc to front of path queue
         game.players[key].path.unshift([game.players[key].pos_list[0][0],game.players[key].pos_list[0][1]]);
         
@@ -354,6 +361,7 @@ var update_count = 0; //global var to trigger authoritative updates
 setInterval(function(){
   //console.log("in the udpate loop" + " the counter is " + update_count);
     //NOTE: node is not multithreaded so the queue is safe within the scope of this function
+    //console.log("game: " + game.toString());
     if(game){
       //console.log("game is set");
          //1. UPDATE PLAYER DIRECTIONS BASED ON INPUTS

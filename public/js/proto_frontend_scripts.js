@@ -85,8 +85,11 @@ function check_overlap(x1, y1, x2, y2, rad){
 // checkCollision_Board takes a player p1 and gameboard g and returns true if p1
 // has hit the boundaries of g
 function checkCollision_Board(p1,g) {
+    // check upper bounds
 	if (p1.pos_list[0][0]+5 >= g.board.x || p1.pos_list[0][1]+5 >= g.board.y) {return true;}
+    // check lower bounds
 	else if (p1.pos_list[0][0]-5 <= 0 || p1.pos_list[0][0]-5 <= 0) {return true;}
+    // if neither of the above triggered, return false
 	return false;
 }
 
@@ -109,14 +112,19 @@ function checkCollision_Food(p1, foods) {
 
 // ======================================================================================================
 function convertFood(p1, g){
+    console.log("\n");
 	for (var i = 0; i < p1.length; i+2) {
+        console.log("e");
 		var food_temp = { x:p1.pos_list[i][0], y:p1.pos_list[i][1] };
 		g.foods.push(food_temp);
 	}
+    console.log("\n");
 }
 
 function checkGameEvents(p1, g){
+    
 	if (checkCollision_Board(p1, g)){
+        console.log("q\n");
 		p1.alive = false;
 		convertFood(p1,g);
 	}

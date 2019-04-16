@@ -3,15 +3,15 @@
 // Our main game object that will handle most aspects of the game
 var game_object = function(instance) {
 	
-	this.server = false;
+	this.server = (instance !== undefined);
 	this.players = {};
 	
-	if (instance !== undefined) {
-		this.server = true;
-	}
+	//if (instance !== undefined) {
+	//	this.server = true;
+	//}
 	
 	this.board = {
-		hieght : 640,
+		height : 640,
 		width : 640
 	};
 }
