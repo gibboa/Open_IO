@@ -93,7 +93,7 @@ function keyToDir(keyCode){
         case 38: return('up'); break; 
         case 40: return('down'); break; 
         case 39: return('right'); break; 
-        case 37: return('left'); break; 
+        case 37: return('left'); break;
         default: return(''); //uncomment to check other key codes
     }
 }
@@ -344,6 +344,32 @@ function moveSnakes(){
     }
 }
 
+//function to adjust the boost levels of all players
+function updateBoosts(){
+  for(var key in game.players) {
+    if(game.players[key].boosting){
+      //decrease boost meter
+      game.players[key].boost_level -= 1;//WAS 0.25 but testing with 1
+    }else{
+      //increase boos meter
+      game.players[key].boost_level += 1;
+    }
+    if(game.players[key].boost_level > game.players[key].boost_cap){
+      game.players[key].boost_level = game.players[key].boost_cap;
+    }
+    if(game.players[key].boost_level < 0){
+      game.players[key].boost_level = 0;
+    }
+    //adjust velocity based on input and boost meter
+    if(game.players[key].boosting && game.players[key].boost_level > 0){
+      game.players[key].velocity = 5;
+    }else{
+      game.players[key].velocity = 2;
+    }
+  }
+    
+}
+
 
 ///////////////////////Game Object Creation////////////////////////////////////
 var game = {
@@ -396,10 +422,25 @@ setInterval(function(){
         for(i = 0; i < len; i++){
           //console.log("we must have had an input");
             let input = inputQueue.pop();//input is [socket.id, key_code]
-            //process each input (only inputs are direction changes right now)
-            game.players[input[0]].direction = keyToDir(input[1]);
+            //process each input 
+            //if input toggles boost:
+            if (input[1] == true || input[1] == false){
+              console.log("WE HAVE A T/F input");
+              game.players[input[0]].boosting = input[1];
+              //CHANGING VELOCITY OF PLAYER TEMPORARILY WITHOUT CONSIDER BOOST METER
+              //if(game.players[input[0]].boosting){
+                //game.players[input[0]].velocity = 5;
+              //}else{
+                //game.players[input[0]].velocity = 2;
+              //}
+              
+            }else{//input changes direction
+              game.players[input[0]].direction = keyToDir(input[1]);
+            }
         }
 
+        //1.5 UPDATE BOOST METERS AND VELOCITY 
+        updateBoosts();
         //2. UPDATE PLAYER LOCATIONS BASED ON DIRECTION
         //moveSnakes(game);
         moveSnakes();
@@ -419,13 +460,13 @@ setInterval(function(){
             update_count = 0;
         }
         //DEBUG CODE
-        for(let key in game.players){
-          console.log("player name: " + game.players[key].name + " has a length of " + game.players[key].length);
-          console.log("their path_len is " + game.players[key].paht_len + " their path has a len " + game.players[key].path.length);
-        }
-        if (game.foods){
-        console.log("last two food locs are: ( "+ game.foods[game.foods.length - 1].x +" , " + game.foods[game.foods.length - 1].y + " ) ( "+ game.foods[game.foods.length - 2].x +" , " + game.foods[game.foods.length - 2].y + " )");
-        }//END DEBUG CODE
+        //for(let key in game.players){
+          //console.log("player name: " + game.players[key].name + " has a length of " + game.players[key].length);
+          //console.log("their path_len is " + game.players[key].paht_len + " their path has a len " + game.players[key].path.length);
+        //}
+        //if (game.foods){
+        //console.log("last two food locs are: ( "+ game.foods[game.foods.length - 1].x +" , " + game.foods[game.foods.length - 1].y + " ) ( "+ game.foods[game.foods.length - 2].x +" , " + game.foods[game.foods.length - 2].y + " )");
+        //}//END DEBUG CODE
     } 
 
 }, 1000/15);// call func every 15 ms
@@ -461,13 +502,13 @@ io.on('connection', function (socket) {
       direction: snakeDir, 
       length: snakeLen,
       score: 0,
-      velocity: 3, //originally was 1... 2 might be ideal if boost was implemented
+      velocity: 2, //originally was 1... 2 might be ideal if boost was implemented
       //Here color will be a random int, and there are 3 colors on the sprite sheet
       color: initColor(),
       status: true,
       path: snakePath,
       path_len: 25,
-      boost_level: 100,
+      boost_level: 100, //double
       boost_cap: 100,
       boosting: false
   	};
@@ -503,6 +544,11 @@ io.on('connection', function (socket) {
 		//game_serv.message("playerMovement", data);
 		
   	});
+
+    socket.on('playerBoost', function(data){
+      console.log("BOOST MSG RECIEVED");
+      inputQueue.unshift([socket.id, data.input]);//data.input is bool, true/false
+    });
 
   	//send the players object to the new player
   	//socket.emit('currentPlayers', players);

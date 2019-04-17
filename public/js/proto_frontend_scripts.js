@@ -152,7 +152,7 @@ function drawBoostMeter(g,id){
 	pen.font = "16px Arial";
 	pen.fillStyle = "red";
 	pen.fillText("Boost", 30, 380);
-	pen.fillRect(40,250,20,g.players[id].boost_level);
+	pen.fillRect(40,250,20,Math.floor(g.players[id].boost_level));
 	
 }
 
@@ -348,21 +348,34 @@ function initGame(){
 	//add event listener for player input
 	//pass it an inline anon function
 	window.addEventListener('keydown', function(event) {
-       	var key_code = event.keyCode;
+       	let key_code = event.keyCode;
        	//alert("u pressed" + key_code);
-        //attempting to send this data to server with emit if key was for movement
-        if(keyToDir(key_code) != ''){
+        if (key_code == 16 || key_code == 32){//this is not written to handle client prediction yet
+        	//alert("EMITTING BOOS MSG");
+            socket.emit('playerBoost',{
+	        	input: true //when key: SHIFT or SPACE is down, then toggle boost to true
+        	});
+        }else if(keyToDir(key_code) != ''){
         	//alert("the key you just pressed is a valid movement");
         	//inputQueue.unshift([player_ID, key_code])
-        	socket.emit('playerMovement',{
+            socket.emit('playerMovement',{
 	        	input: key_code
 	        	//NOTE when caught by listener on server key_code is accessed via arg.input
 	        	//in our case the arg is called data, so data.input
         	});
         }
-
-
     }, false);
+
+	//listen for keyup of shift or spacebar to end boost
+	window.addEventListener('keyup', function(event) {
+		let key_code = event.keyCode;
+		if (key_code == 16 || key_code == 32){
+            socket.emit('playerBoost',{
+	        	input: false //when key: SHIFT or SPACE is down, then toggle boost to true
+        	});
+        }
+    }, false);
+
 
 	//listens for gameStateUpdate message from server (just alerts for testing)
 	//(This works here, but doesn't work when called in update function)
