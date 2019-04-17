@@ -279,27 +279,46 @@ function moveSnakes(){
         let change_x = 0, change_y = 0;
         cur_dir = game.players[key].direction
         if(cur_dir == 'up'){//up
-            change_y = -1;
+            change_y = -1 * game.players[key].velocity;
         }else if(cur_dir == 'right'){//right
-            change_x = 1;
+            change_x = 1 * game.players[key].velocity;
         }else if(cur_dir == 'down'){//down
-            change_y = 1;
+            change_y = 1 * game.players[key].velocity;
         }else{//left
-            change_x = -1;
+            change_x = -1 * game.players[key].velocity;
         }
 
+        //move head of snake
         game.players[key].pos_list[0][0] += change_x;
         game.players[key].pos_list[0][1] += change_y;
-        //push new loc to front of path queue
-        game.players[key].path.unshift([game.players[key].pos_list[0][0],game.players[key].pos_list[0][1]]);
-        
+
+        //push new loc to front of path queue and all points in between in velocity
+        if(cur_dir == 'up'){//up
+          for(let i = game.players[key].velocity - 1; i >= 0; i--){
+            game.players[key].path.unshift([game.players[key].pos_list[0][0],game.players[key].pos_list[0][1]+i]);
+          }
+        }else if(cur_dir == 'right'){//right
+          for(let i = game.players[key].velocity - 1; i >= 0; i--){
+            game.players[key].path.unshift([game.players[key].pos_list[0][0]-i,game.players[key].pos_list[0][1]]);
+          }
+        }else if(cur_dir == 'down'){//down
+          for(let i = game.players[key].velocity - 1; i >= 0; i--){
+            game.players[key].path.unshift([game.players[key].pos_list[0][0],game.players[key].pos_list[0][1]-i]);
+          }
+        }else{//left
+          for(let i = game.players[key].velocity - 1; i >= 0; i--){
+            game.players[key].path.unshift([game.players[key].pos_list[0][0]+i,game.players[key].pos_list[0][1]]);
+          } 
+        }
+       
+
         //loop through segment coords and get new coord off path
         for(let i=1; i < game.players[key].length; i++){
-            game.players[key].pos_list[i][0] = game.players[key].path[i*6][0];
-            game.players[key].pos_list[i][1] = game.players[key].path[i*6][1];
+            game.players[key].pos_list[i][0] = game.players[key].path[i*6 + (1*game.players[key].velocity)][0];
+            game.players[key].pos_list[i][1] = game.players[key].path[i*6 + (1*game.players[key].velocity)][1];
         }
 
-        if(game.players[key].path.length > game.players[key].path_len){
+        while(game.players[key].path.length > game.players[key].path_len){//was if
           //we dont need to store extra coords until another segment is add
           //which means we have enough room to add a segment if needed
           game.players[key].path.pop();//so pop last value
@@ -440,7 +459,7 @@ io.on('connection', function (socket) {
       direction: snakeDir, 
       length: snakeLen,
       score: 0,
-      velocity: 1, //dont know what to put for this yet
+      velocity: 3, //originally was 1... 2 might be ideal if boost was implemented
       //Here color will be a random int, and there are 3 colors on the sprite sheet
       color: initColor(),
       status: true,
