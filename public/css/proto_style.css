@@ -17,21 +17,21 @@ body{
 	position:relative;
 	left:50%;
 	width:200px;
-	height:240px;
+	height:400px;/*was 240 before adding boost*/
 	background-color:#80DEEA;
-	margin: 0 0 400px -12px;
+	margin: 0 0 240px 0px;
 	/*border: 2px solid black;*/
 }
 
-#boost
+#boost/*maybe removing this*/
 {
 	position:relative;
-	left:50%;
-	width:80px;
-	height:200px;
-	background-color:#80DEEA;
-	margin: 0 0 0px 0px;
-	border: 2px solid black;
+	/*left:50%;*/
+	width:60px;
+	height:160px;
+	background-color:#fff;
+	margin: 0 0px 0px -150px;
+	/*border: 2px solid red;*/
 }
 
 #game_barrier 

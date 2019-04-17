@@ -42,8 +42,8 @@ function checkCollision_Food(p1, foods) {
 
 // ======================================================================================================
 function convertFood(p1, g){
-  for (var i = 0; i < p1.length; i+2) {
-    var food_temp = { x:p1.pos_list[i][0], y:p1.pos_list[i][1] };
+  for (var i = 1; i < p1.length; i+=2) {
+    let food_temp = { x:p1.pos_list[i][0], y:p1.pos_list[i][1] };
     g.foods.push(food_temp);
   }
 }
@@ -66,10 +66,12 @@ function checkGameEvents(p1, g){
     if (checkCollision_Food(p1, g.foods[i])){
       p1.score += 10;
       g.foods.splice(i, 1);
-      p1.path_len += 6;
+      p1.path_len += 12;//changed from 6 to mitigate overeating bug... 
+      //unfortunately this will grow our array far beyond what we need
+      //pretty sure this is an upper bound, there are more efficient solutions...
       p1.pos_list.push([p1.path[p1.length*6][0], p1.path[p1.length*6][1]]);
       p1.length += 1;
-      addFood(g.foods);
+      addFood(g);
     }
   }
 }
@@ -120,24 +122,31 @@ function initColor(){
 
 
 //Function to add a single food after one has been eaten
-//Args: food list
+//Args: game object
 //Returns: none
-//Modifies: food list
-function addFood(f){
+//Modifies: food list of game object
+function addFood(g){
   let locationsNotValidated = true;
   while(locationsNotValidated){
     let fx = Math.floor(Math.random() * 628) + 6; //current board is 640px X 640px so
     let fy = Math.floor(Math.random() * 628) + 6; //place player randomly between 160px-480px
     let currFoodValid = true
-    for(let i=0; i<f.length; i++){
-      if(check_overlap(fx, fy, f[i].x, f[i].y, 6)){
+    for(let i=0; i<g.foods.length; i++){
+      if(check_overlap(fx, fy, g.foods[i].x, g.foods[i].y, 6,6)){//could be 5,5
         currFoodValid = false;
       }
     }
-    if(currFoodValid){
-      f.push({x:fx, y:fy}); 
+    for(let k in g.players){
+      for(let i=0; i<g.players[k].pos_list.length; i++){
+        if(check_overlap(fx, fy, g.players[k].pos_list[i].x, g.players[k].pos_list[i].y, 6,6)){
+          currFoodValid = false;
+        }
+      }
     }
-    if(f.length >= 10){
+    if(currFoodValid){
+      g.foods.push({x:fx, y:fy}); 
+    }
+    if(g.foods.length >= 10){
       locationsNotValidated = false;
     }
   }
@@ -388,6 +397,14 @@ setInterval(function(){
             //io.sockets.emit('authoritativeUpdate', game);
             update_count = 0;
         }
+        //DEBUG CODE
+        for(let key in game.players){
+          console.log("player name: " + game.players[key].name + " has a length of " + game.players[key].length);
+          console.log("their path_len is " + game.players[key].paht_len + " their path has a len " + game.players[key].path.length);
+        }
+        if (game.foods){
+        console.log("last two food locs are: ( "+ game.foods[game.foods.length - 1].x +" , " + game.foods[game.foods.length - 1].y + " ) ( "+ game.foods[game.foods.length - 2].x +" , " + game.foods[game.foods.length - 2].y + " )");
+        }//END DEBUG CODE
     } 
 
 }, 1000/15);// call func every 15 ms

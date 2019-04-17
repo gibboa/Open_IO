@@ -35,40 +35,7 @@ function keyToDir(keyCode){
 //Returns: none, changes made to referenced object
 //Requires: game is initialized
 function moveSnakes(game){
-    //arbitraily going to move the snake 1px...no clue how this will go
-    for(var key in game.players) {
-        let change_x = 0, change_y = 0;
-        cur_dir = game.players[key].direction
-        if(cur_dir == 'up'){//up
-            change_y = -1;
-        }else if(cur_dir == 'right'){//right
-            change_x = 1;
-        }else if(cur_dir == 'down'){//down
-            change_y = 1;
-        }else{//left
-            change_x = -1;
-        }
-        //this is where i WOULD loop through each segment position and change it but....
-        //for(let i=0; i < game.players[key].pos_list.length; i++){
-          //some thoughts on how to get the snake segments to follow the path of the head
-          //maybe save the position whenever there is a change in direction and until you reach
-          //that position, you dont change direction (every segment needs a direction)
-          //OK HERES THE PLAN
-          //currently position list is [[x,y]]
-          //it will become [[x,y,curr_direction, new_direction_set-->true/false, new_direction, turn_at_x, turn_at_y]]
-          //so if pos_list[3] is false, we dont need to worry about turning the snake
-          //1. whenever a snake turns, the turn propagates down the body,
-          //   so when the head turns, pass data to the segment behind it
-          //   pos_list[3] = true, pos_list[4] = direction curr segment is turning to
-          //   pos_list[5] = x coord where next turn takes place, pos_list[6] = y coord of next turn
-          //2. before moving a segment, IF pos_list[3]==true AND curr position x,y == turn_at x,y
-          //   THEN change the curr direction of segment to new_direction
-          //3. propagate turn back following segment if one exists
-          //3. move segment in curr direction which was just updated from the old one...
-        //}
-        game.players[key].pos_list[0][0] += change_x;
-        game.players[key].pos_list[0][1] += change_y;
-    }
+    //stub... latest real version is in server.js right now
 }
 
 // Functions that check whether the current player is colliding with either the gameboard
@@ -175,6 +142,19 @@ function drawFood(foodList,pen){
 	}
 }
 
+//Draw the boost meter
+function drawBoostMeter(g){
+	//let boost_meter_canvas = $("boost");
+	//let pen = boost_meter_canvas.getContext("2d");
+	let scoreboard_canvas = $("scoreboard");
+	let pen = scoreboard_canvas.getContext("2d");
+	pen.font = "14px Arial";
+	pen.fillStyle = "red";
+	//pen.textAlign = "center";
+	pen.fillText("Boost", 90, 380);
+	if(!g){return;}//game must be initialized
+}
+
 //Draw the scoreboard
 //currently draws on a separate canvas with id="scoreboard"
 //later this will be drawn on the main canvas in the upper right corner
@@ -185,7 +165,7 @@ function drawScores(g){
 	let pen = scoreboard_canvas.getContext("2d");
 	pen.font = "20px Arial";
 	pen.fillStyle = "red";
-	pen.textAlighn = "center";
+	//pen.textAlighn = "center";
 	pen.fillText("Leaderboard", 45, 25);
 	if(!g){return;}//game must be initialized
 	//creating fake players object for testing////////////
@@ -275,6 +255,7 @@ function redrawCanvas(pen, game){
 	let scoreboard_pen = scoreboard_canvas.getContext("2d");
 	scoreboard_pen.clearRect(0, 0, 200, 240);//clear scoreboard
 	drawScores(game);
+	drawBoostMeter(game);
 }
 
 
