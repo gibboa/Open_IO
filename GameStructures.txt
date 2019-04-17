@@ -21,8 +21,12 @@ game.players[socket.id] = {
       alive: true               //bool: true/false ... this was a string but bool will be faster
       path: [[x,y]]             //list of lists of coords, a pixel by pixel path which segments must 
                                 //travel along as they move
-      paht_len: (length*6)+6    //max number of coords we need to store in path... increase by 6 whenever 
+      paht_len: (length*6)+6    //max number of coords we need to store in path...increase by 12 whenever 
                                 //the snake grows
+      boost_level: 100          //int , level of boost a player has... at 0 they cant boost, its capped 
+                                //at boost_cap
+      boost_cap: 100            //max boost level allowed
+      boosting: false           //bool says if boost is in use or not, default is false
     };
 
 //sample food object...may add more fields later for time or type of food

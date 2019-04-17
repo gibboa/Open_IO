@@ -151,16 +151,17 @@ function drawFood(foodList,pen){
 }
 
 //Draw the boost meter
-function drawBoostMeter(g){
-	//let boost_meter_canvas = $("boost");
-	//let pen = boost_meter_canvas.getContext("2d");
+function drawBoostMeter(g,id){
+	if(!g){return;}//game must be initialized
+	if(id == ""){return;}//dont bother if we havnt set id yet
+	//drawing boost meter on same canvas as scoreboard
 	let scoreboard_canvas = $("scoreboard");
 	let pen = scoreboard_canvas.getContext("2d");
-	pen.font = "14px Arial";
+	pen.font = "16px Arial";
 	pen.fillStyle = "red";
-	//pen.textAlign = "center";
-	pen.fillText("Boost", 90, 380);
-	if(!g){return;}//game must be initialized
+	pen.fillText("Boost", 30, 380);
+	pen.fillRect(40,250,20,Math.floor(g.players[id].boost_level));
+	
 }
 
 //Draw the scoreboard
@@ -252,7 +253,7 @@ function drawSnake(pen, player){
 //It will clear the canvas and call all needed draw functions
 //Args: none
 //Returns: none
-function redrawCanvas(pen, game){
+function redrawCanvas(pen, game, id){
 	pen.clearRect(0, 0, 640, 640);//clear canvas
 	drawBG(pen);
 	for(var key in game.players){
@@ -263,7 +264,7 @@ function redrawCanvas(pen, game){
 	let scoreboard_pen = scoreboard_canvas.getContext("2d");
 	scoreboard_pen.clearRect(0, 0, 200, 240);//clear scoreboard
 	drawScores(game);
-	drawBoostMeter(game);
+	drawBoostMeter(game, id);
 }
 
 
@@ -355,21 +356,34 @@ function initGame(){
 	//add event listener for player input
 	//pass it an inline anon function
 	window.addEventListener('keydown', function(event) {
-       	var key_code = event.keyCode;
+       	let key_code = event.keyCode;
        	//alert("u pressed" + key_code);
-        //attempting to send this data to server with emit if key was for movement
-        if(keyToDir(key_code) != ''){
+        if (key_code == 16 || key_code == 32){//this is not written to handle client prediction yet
+        	//alert("EMITTING BOOS MSG");
+            socket.emit('playerBoost',{
+	        	input: true //when key: SHIFT or SPACE is down, then toggle boost to true
+        	});
+        }else if(keyToDir(key_code) != ''){
         	//alert("the key you just pressed is a valid movement");
         	//inputQueue.unshift([player_ID, key_code])
-        	socket.emit('playerMovement',{
+            socket.emit('playerMovement',{
 	        	input: key_code
 	        	//NOTE when caught by listener on server key_code is accessed via arg.input
 	        	//in our case the arg is called data, so data.input
         	});
         }
-
-
     }, false);
+
+	//listen for keyup of shift or spacebar to end boost
+	window.addEventListener('keyup', function(event) {
+		let key_code = event.keyCode;
+		if (key_code == 16 || key_code == 32){
+            socket.emit('playerBoost',{
+	        	input: false //when key: SHIFT or SPACE is down, then toggle boost to true
+        	});
+        }
+    }, false);
+
 
 	//listens for gameStateUpdate message from server (just alerts for testing)
 	//(This works here, but doesn't work when called in update function)
@@ -380,7 +394,7 @@ function initGame(){
 	socket.on('authoritativeUpdate', function(data){
 		//somehow update entire local gamestate with (data is the game obj here)
 		game = data;//probly need to do deep copy, doubt this works
-		redrawCanvas(ctx, game);
+		redrawCanvas(ctx, game, player_ID);
 	});
 
 }
