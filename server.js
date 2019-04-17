@@ -314,8 +314,10 @@ function moveSnakes(){
 
         //loop through segment coords and get new coord off path
         for(let i=1; i < game.players[key].length; i++){
-            game.players[key].pos_list[i][0] = game.players[key].path[i*6 + (1*game.players[key].velocity)][0];
-            game.players[key].pos_list[i][1] = game.players[key].path[i*6 + (1*game.players[key].velocity)][1];
+            game.players[key].pos_list[i][0] = game.players[key].path[i*6][0];
+            game.players[key].pos_list[i][1] = game.players[key].path[i*6][1];
+            //game.players[key].pos_list[i][0] = game.players[key].path[i*6 + (1*game.players[key].velocity)][0];
+            //game.players[key].pos_list[i][1] = game.players[key].path[i*6 + (1*game.players[key].velocity)][1];
         }
 
         while(game.players[key].path.length > game.players[key].path_len){//was if
