@@ -466,7 +466,10 @@ io.on('connection', function (socket) {
       color: initColor(),
       status: true,
       path: snakePath,
-      path_len: 25
+      path_len: 25,
+      boost_level: 100,
+      boost_cap: 100,
+      boosting: false
   	};
      if(game){
         console.log("THE GAME IS SET IN THE INIT FUNCTION");
