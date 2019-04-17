@@ -1,4 +1,4 @@
-This files describes the structures used to represent the games state. Use as a references when writing code.
+This files describes the structures used to represent the games state. Use as a reference when writing code.
 
 //Latest version of game object 
 //sample declaration
@@ -19,12 +19,20 @@ game.players[socket.id] = {
       velocity: 1,              //int: for adjusting speed (will have to tinker with this)
       color: //random num       //int: in range 0-number of snake skins in sprite sheet (for selecting snakes appearance)
       alive: true               //bool: true/false ... this was a string but bool will be faster
+      path: [[x,y]]             //list of lists of coords, a pixel by pixel path which segments must 
+                                //travel along as they move
+      paht_len: (length*6)+6    //max number of coords we need to store in path...increase by 12 whenever 
+                                //the snake grows
+      boost_level: 100          //int , level of boost a player has... at 0 they cant boost, its capped 
+                                //at boost_cap
+      boost_cap: 100            //max boost level allowed
+      boosting: false           //bool says if boost is in use or not, default is false
     };
 
 //sample food object...may add more fields later for time or type of food
 var food = {
-    x = 250,
-    y = 250
+    x : 250,
+    y : 250
 }
 //NOTE: food and snake position coords represent the CENTER of the object
 
