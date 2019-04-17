@@ -7,9 +7,9 @@ var io = require('socket.io').listen(server);
 // Functions that check whether the current player is colliding with either the gameboard
 // boundaries, any of the other players, or any of the food objects
 
-function check_overlap(x1, y1, x2, y2, rad1, rad2){
-  if ( (x1+rad1 >= x2-rad2 && x1+rad1 <= x2+rad2) || (x1-rad1 <= x2+rad2 && x1+rad1 >= x2-rad2) ) {
-    if ( (y1+rad1 >= y2-rad2 && y1+rad1 <= y2+rad2) || (y1-rad1 <= y2+rad2 && y1-rad1 >= y2-rad2) ){
+function check_overlap(x1, y1, x2, y2, rad){
+  if ( (x1+rad >= x2-rad && x1+rad <= x2+rad) || (x1-rad <= x2+rad && x1+rad >= x2-rad) ) {
+    if ( (y1+rad >= y2-rad && y1+rad <= y2+rad) || (y1-rad <= y2+rad && y1-rad >= y2-rad) ){
       return true;
     }
   }
@@ -26,7 +26,7 @@ function checkCollision_Board(p1,g) {
 // checkCollision_Player takes two players p1 and p2 and returns true if p1 hits the hitbox of p2
 function checkCollision_Player(p1, p2) {
   for (var i = 0; i < p2.pos_list.length; i++) {
-    if (check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], p2.pos_list[i][0], p2.pos_list[i][1], 5,5) == true){
+    if (check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], p2.pos_list[i][0], p2.pos_list[i][1], 5) == true){
       return true;
     }
   }
@@ -36,16 +36,19 @@ function checkCollision_Player(p1, p2) {
 // checkCollision_Food takes a player p1 and a list of food objects foods and returns true if p1
 // hits any one of the the objects in foods
 function checkCollision_Food(p1, foods) {
-  return check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], foods.x, foods.y, 5,5);
+  return check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], foods.x, foods.y, 5);
 }
 
 
 // ======================================================================================================
 function convertFood(p1, g){
-  for (var i = 1; i < p1.length; i+=2) {
-    let food_temp = { x:p1.pos_list[i][0], y:p1.pos_list[i][1] };
+    //console.log("p1.length: " + p1.length + "\n");
+  for (var i = 0; i < p1.length; i+=2) {
+      //console.log("i: " + i);
+    var food_temp = { x:p1.pos_list[i][0], y:p1.pos_list[i][1] };
     g.foods.push(food_temp);
   }
+  //console.log("\n");
 }
 
 function checkGameEvents(p1, g){
@@ -67,15 +70,13 @@ function checkGameEvents(p1, g){
     if (checkCollision_Food(p1, g.foods[i])){
       p1.score += 10;
       g.foods.splice(i, 1);
-      p1.path_len += 12;//changed from 6 to mitigate overeating bug... 
-      //unfortunately this will grow our array far beyond what we need
-      //pretty sure this is an upper bound, there are more efficient solutions...
+      p1.path_len += 6;
       console.log("p1.length: " + p1.length + " * 6 = " + (p1.path[p1.length*6]));
       console.log("p1.path[p1.length*6][0]: " + p1.path[p1.length*6][0]);
-      
+      //console.log("p1.path: " + p1.path);
       p1.pos_list.push([p1.path[p1.length*6][0], p1.path[p1.length*6][1]]);
       p1.length += 1;
-      addFood(g);
+      addFood(g.foods);
     }
   }
 }
@@ -126,31 +127,24 @@ function initColor(){
 
 
 //Function to add a single food after one has been eaten
-//Args: game object
+//Args: food list
 //Returns: none
-//Modifies: food list of game object
-function addFood(g){
+//Modifies: food list
+function addFood(f){
   let locationsNotValidated = true;
   while(locationsNotValidated){
     let fx = Math.floor(Math.random() * 628) + 6; //current board is 640px X 640px so
     let fy = Math.floor(Math.random() * 628) + 6; //place player randomly between 160px-480px
     let currFoodValid = true
-    for(let i=0; i<g.foods.length; i++){
-      if(check_overlap(fx, fy, g.foods[i].x, g.foods[i].y, 6,6)){//could be 5,5
+    for(let i=0; i<f.length; i++){
+      if(check_overlap(fx, fy, f[i].x, f[i].y, 6)){
         currFoodValid = false;
       }
     }
-    for(let k in g.players){
-      for(let i=0; i<g.players[k].pos_list.length; i++){
-        if(check_overlap(fx, fy, g.players[k].pos_list[i].x, g.players[k].pos_list[i].y, 6,6)){
-          currFoodValid = false;
-        }
-      }
-    }
     if(currFoodValid){
-      g.foods.push({x:fx, y:fy}); 
+      f.push({x:fx, y:fy}); 
     }
-    if(g.foods.length >= 10){
+    if(f.length >= 10){
       locationsNotValidated = false;
     }
   }
@@ -283,47 +277,27 @@ function moveSnakes(){
         let change_x = 0, change_y = 0;
         cur_dir = game.players[key].direction
         if(cur_dir == 'up'){//up
-            change_y = -1 * game.players[key].velocity;
+            change_y = -1;
         }else if(cur_dir == 'right'){//right
-            change_x = 1 * game.players[key].velocity;
+            change_x = 1;
         }else if(cur_dir == 'down'){//down
-            change_y = 1 * game.players[key].velocity;
+            change_y = 1;
         }else{//left
-            change_x = -1 * game.players[key].velocity;
+            change_x = -1;
         }
-        
-        //move head of snake
-        game.players[key].pos_list[0][0] += change_x;
-        game.players[key].pos_list[0][1] += change_y;
 
-        //push new loc to front of path queue and all points in between in velocity
-        if(cur_dir == 'up'){//up
-          for(let i = game.players[key].velocity - 1; i >= 0; i--){
-            game.players[key].path.unshift([game.players[key].pos_list[0][0],game.players[key].pos_list[0][1]+i]);
-          }
-        }else if(cur_dir == 'right'){//right
-          for(let i = game.players[key].velocity - 1; i >= 0; i--){
-            game.players[key].path.unshift([game.players[key].pos_list[0][0]-i,game.players[key].pos_list[0][1]]);
-          }
-        }else if(cur_dir == 'down'){//down
-          for(let i = game.players[key].velocity - 1; i >= 0; i--){
-            game.players[key].path.unshift([game.players[key].pos_list[0][0],game.players[key].pos_list[0][1]-i]);
-          }
-        }else{//left
-          for(let i = game.players[key].velocity - 1; i >= 0; i--){
-            game.players[key].path.unshift([game.players[key].pos_list[0][0]+i,game.players[key].pos_list[0][1]]);
-          } 
-        }
+        game.players[key].pos_list[0][0] += change_x * 2;
+        game.players[key].pos_list[0][1] += change_y * 2;
+        //push new loc to front of path queue
+        game.players[key].path.unshift([game.players[key].pos_list[0][0],game.players[key].pos_list[0][1]]);
         
         //loop through segment coords and get new coord off path
         for(let i=1; i < game.players[key].length; i++){
             game.players[key].pos_list[i][0] = game.players[key].path[i*6][0];
             game.players[key].pos_list[i][1] = game.players[key].path[i*6][1];
-            //game.players[key].pos_list[i][0] = game.players[key].path[i*6 + (1*game.players[key].velocity)][0];
-            //game.players[key].pos_list[i][1] = game.players[key].path[i*6 + (1*game.players[key].velocity)][1];
         }
 
-        while(game.players[key].path.length > game.players[key].path_len){//was if
+        if(game.players[key].path.length > game.players[key].path_len){
           //we dont need to store extra coords until another segment is add
           //which means we have enough room to add a segment if needed
           game.players[key].path.pop();//so pop last value
@@ -390,7 +364,6 @@ setInterval(function(){
     //console.log("game: " + game.toString());
     if(game){
       //console.log("game is set");
-        
          //1. UPDATE PLAYER DIRECTIONS BASED ON INPUTS
         let i;
         let len = 0;
@@ -422,14 +395,6 @@ setInterval(function(){
             //io.sockets.emit('authoritativeUpdate', game);
             update_count = 0;
         }
-        //DEBUG CODE
-        for(let key in game.players){
-          //console.log("player name: " + game.players[key].name + " has a length of " + game.players[key].length);
-          //console.log("their path_len is " + game.players[key].paht_len + " their path has a len " + game.players[key].path.length);
-        }
-        if (game.foods){
-        console.log("last two food locs are: ( "+ game.foods[game.foods.length - 1].x +" , " + game.foods[game.foods.length - 1].y + " ) ( "+ game.foods[game.foods.length - 2].x +" , " + game.foods[game.foods.length - 2].y + " )");
-        }//END DEBUG CODE
     } 
 
 }, 1000/15);// call func every 15 ms
@@ -465,7 +430,7 @@ io.on('connection', function (socket) {
       direction: snakeDir, 
       length: snakeLen,
       score: 0,
-      velocity: 3, //originally was 1... 2 might be ideal if boost was implemented
+      velocity: 1, //dont know what to put for this yet
       //Here color will be a random int, and there are 3 colors on the sprite sheet
       color: initColor(),
       status: true,
