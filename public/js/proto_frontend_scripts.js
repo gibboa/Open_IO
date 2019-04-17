@@ -52,6 +52,7 @@ function check_overlap(x1, y1, x2, y2, rad1, rad2){
 // checkCollision_Board takes a player p1 and gameboard g and returns true if p1
 // has hit the boundaries of g
 function checkCollision_Board(p1,g) {
+  console.log("CHECKING");
 	if (p1.pos_list[0][0]+5 >= g.board.x || p1.pos_list[0][1]+5 >= g.board.y) {return true;}
 	else if (p1.pos_list[0][0]-5 <= 0 || p1.pos_list[0][0]-5 <= 0) {return true;}
 	return false;
@@ -70,7 +71,10 @@ function checkCollision_Player(p1, p2) {
 // checkCollision_Food takes a player p1 and a list of food objects foods and returns true if p1
 // hits any one of the the objects in foods
 function checkCollision_Food(p1, foods) {
-	return check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], foods.x, foods.y, 5,5);
+  if (p1.alive){
+    console.log("EATING");
+	   return check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], foods.x, foods.y, 5,5);
+  }
 }
 
 
@@ -83,16 +87,24 @@ function convertFood(p1, g){
 }
 
 function checkGameEvents(p1, g){
+  console.log("Checking coll");
 	if (checkCollision_Board(p1, g)){
-		p1.alive = false;
+    console.log("deleting player");
 		convertFood(p1,g);
+    p1.alive = false;
+    for (var i = 0; i < g.players.length; i++) {
+      if (g.players[i].playerId == p1.playerId){
+        delete g.players[i];
+      }
+    }
 	}
 
 	for (var i = 0; i < g.players.length; i++) {
 		if (checkCollision_Player(p1,g.players[i])){
 			p1.alive = false;
 			g.players[i].score += 100;
-			convertFood(p1,g)
+			convertFood(p1,g);
+      delete g.players[p1];
 		}
 	}
 
@@ -103,7 +115,7 @@ function checkGameEvents(p1, g){
 		    p1.path_len += 6;
 		    p1.pos_list.push([p1.path[p1.length*6][0], p1.path[p1.length*6][1]]);
 		    p1.length += 1;
-    	}	
+    	}
 	}
 }
 
@@ -153,7 +165,7 @@ function drawBoostMeter(g,id){
 	pen.fillStyle = "red";
 	pen.fillText("Boost", 30, 380);
 	pen.fillRect(40,250,20,Math.floor(g.players[id].boost_level));
-	
+
 }
 
 //Draw the scoreboard
@@ -238,7 +250,7 @@ function drawSnake(pen, player){
 			pen.drawImage(tile, 30, offset, 10, 10, player.pos_list[0][0] - 5, player.pos_list[0][1] - 5, 11, 11);
 			break;
 	}
-	
+
 }
 
 //Function to redraw entire canvas at end of update loop
