@@ -293,7 +293,7 @@ function initGame(){
 	drawScores();
 	x= 7;
 	//Establishing Connection to Game Server
-	var socket = io.connect('http://localhost:8081');
+	var socket = io.connect(document.location.origin);
 	socket.on('connect', function(){
 		//alert("you are connected");
 		//send the name that the player typed in before starting
