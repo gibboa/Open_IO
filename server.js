@@ -57,12 +57,14 @@ function convertFood(p1, g){
 function checkGameEvents(p1, g){
   if (checkCollision_Board(p1, g)){
     p1.alive = false;
+    delete g.players[p1.playerId];
     convertFood(p1,g);
   }
 
   for (var i = 0; i < g.players.length; i++) {
     if (checkCollision_Player(p1,g.players[i])){
       p1.alive = false;
+      delete g.players[p1.playerId];
       g.players[i].score += 100;
       convertFood(p1,g);
     }
@@ -77,7 +79,9 @@ function checkGameEvents(p1, g){
       //pretty sure this is an upper bound, there are more efficient solutions...
       p1.pos_list.push([p1.path[p1.length*6][0], p1.path[p1.length*6][1]]);
       p1.length += 1;
-      addFood(g);
+      if(g.foods.length < 10){
+        addFood(g);
+      }
     }
   }
 }
@@ -282,6 +286,7 @@ function initPath(length, dir, arr){
 function moveSnakes(){
     //arbitraily going to move the snake 1px...no clue how this will go
     for(var key in game.players) {
+        if(!game.players[key].alive){continue;}
         let change_x = 0, change_y = 0;
         cur_dir = game.players[key].direction
         if(cur_dir == 'up'){//up
@@ -358,8 +363,9 @@ function updateBoosts(){
       game.players[key].boost_level -= 1;//WAS 0.25 but testing with 1
     }else{
       //increase boos meter
-      game.players[key].boost_level += 1;
+      game.players[key].boost_level += 0.5;
     }
+    console.log("boost level is " + game.players[key].boost_level)
     if(game.players[key].boost_level > game.players[key].boost_cap){
       game.players[key].boost_level = game.players[key].boost_cap;
     }

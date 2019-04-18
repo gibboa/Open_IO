@@ -52,7 +52,7 @@ function check_overlap(x1, y1, x2, y2, rad1, rad2){
 // checkCollision_Board takes a player p1 and gameboard g and returns true if p1
 // has hit the boundaries of g
 function checkCollision_Board(p1,g) {
-  console.log("CHECKING");
+  //console.log("CHECKING");
 	if (p1.pos_list[0][0]+5 >= g.board.x || p1.pos_list[0][1]+5 >= g.board.y) {return true;}
 	else if (p1.pos_list[0][0]-5 <= 0 || p1.pos_list[0][0]-5 <= 0) {return true;}
 	return false;
@@ -72,7 +72,7 @@ function checkCollision_Player(p1, p2) {
 // hits any one of the the objects in foods
 function checkCollision_Food(p1, foods) {
   if (p1.alive){
-    console.log("EATING");
+    //console.log("EATING");
 	   return check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], foods.x, foods.y, 5,5);
   }
 }
@@ -87,9 +87,9 @@ function convertFood(p1, g){
 }
 
 function checkGameEvents(p1, g){
-  console.log("Checking coll");
+  //console.log("Checking coll");
 	if (checkCollision_Board(p1, g)){
-    console.log("deleting player");
+    //console.log("deleting player");
 		convertFood(p1,g);
     p1.alive = false;
     for (var i = 0; i < g.players.length; i++) {
@@ -161,11 +161,12 @@ function drawBoostMeter(g,id){
 	//drawing boost meter on same canvas as scoreboard
 	let scoreboard_canvas = $("scoreboard");
 	let pen = scoreboard_canvas.getContext("2d");
-	pen.font = "16px Arial";
+	pen.font = "14px Arial";
 	pen.fillStyle = "red";
-	pen.fillText("Boost", 30, 380);
-	pen.fillRect(40,250,20,Math.floor(g.players[id].boost_level));
-
+	let h = Math.floor(g.players[id].boost_level);
+	pen.fillText("Boost: (SPACE/SHIFT)", 10, 380);
+	//alert(Math.floor(g.players[id].boost_level) + " was the height");
+	pen.fillRect(40,250+(100-h),20,h);
 }
 
 //Draw the scoreboard
@@ -199,8 +200,9 @@ function drawScores(g){
 	//copying player object into array for array sort
 	let tmp_array = []
 	for(var key in g.players) {
-  		tmp_array.push(g.players[key]);
-  		//console.log(tmp_array); //use console.log and view with developer tools in browser for debugging
+		if(g.players[key].alive){
+  			tmp_array.push(g.players[key]);
+  		}//console.log(tmp_array); //use console.log and view with developer tools in browser for debugging
   		//console.log(players[key]);
   	}
   	//use array sort by player scores (high to low)
@@ -231,24 +233,27 @@ function drawSnake(pen, player){
 	let tile = new Image();
 	tile.src = "pictures/sprite_sheet.png";
 	let offset = player.color*10;
-	//draw back to front
-	for(let i=player.pos_list.length-1; i>=1; i--){
-		pen.drawImage(tile, 40, offset, 10, 10, player.pos_list[i][0] - 5, player.pos_list[i][1] - 5, 11, 11);
-	}
 
-	switch (player.direction){
-		case 'up':
-			pen.drawImage(tile, 0, offset, 10, 10, player.pos_list[0][0] - 5, player.pos_list[0][1] - 5, 11, 11);
-			break;
-		case 'right':
-			pen.drawImage(tile, 10, offset, 10, 10, player.pos_list[0][0] - 5, player.pos_list[0][1] - 5, 11, 11);
-			break;
-		case 'down':
-			pen.drawImage(tile, 20, offset, 10, 10, player.pos_list[0][0] - 5, player.pos_list[0][1] - 5, 11, 11);
-			break;
-		case 'left':
-			pen.drawImage(tile, 30, offset, 10, 10, player.pos_list[0][0] - 5, player.pos_list[0][1] - 5, 11, 11);
-			break;
+	//draw back to front
+	if(player.alive){
+		for(let i=player.pos_list.length-1; i>=1; i--){
+			pen.drawImage(tile, 40, offset, 10, 10, player.pos_list[i][0] - 5, player.pos_list[i][1] - 5, 11, 11);
+		}
+
+		switch (player.direction){
+			case 'up':
+				pen.drawImage(tile, 0, offset, 10, 10, player.pos_list[0][0] - 5, player.pos_list[0][1] - 5, 11, 11);
+				break;
+			case 'right':
+				pen.drawImage(tile, 10, offset, 10, 10, player.pos_list[0][0] - 5, player.pos_list[0][1] - 5, 11, 11);
+				break;
+			case 'down':
+				pen.drawImage(tile, 20, offset, 10, 10, player.pos_list[0][0] - 5, player.pos_list[0][1] - 5, 11, 11);
+				break;
+			case 'left':
+				pen.drawImage(tile, 30, offset, 10, 10, player.pos_list[0][0] - 5, player.pos_list[0][1] - 5, 11, 11);
+				break;
+		}
 	}
 
 }
@@ -266,7 +271,7 @@ function redrawCanvas(pen, game, id){
 	drawFood(game.foods, pen);
 	let scoreboard_canvas = $("scoreboard");
 	let scoreboard_pen = scoreboard_canvas.getContext("2d");
-	scoreboard_pen.clearRect(0, 0, 200, 240);//clear scoreboard
+	scoreboard_pen.clearRect(0, 0, 200, 400);//clear scoreboard
 	drawScores(game);
 	drawBoostMeter(game, id);
 }
@@ -398,7 +403,14 @@ function initGame(){
 	socket.on('authoritativeUpdate', function(data){
 		//somehow update entire local gamestate with (data is the game obj here)
 		game = data;//probly need to do deep copy, doubt this works
-		redrawCanvas(ctx, game, player_ID);
+		if(player_ID in game.players){
+			redrawCanvas(ctx, game, player_ID);
+		}else{
+			//player died and was deleted
+			//alert("you dead");
+			$('game_barrier').style.display = "block";
+		}
+		
 	});
 
 }
