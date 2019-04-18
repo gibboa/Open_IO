@@ -505,7 +505,7 @@ io.on('connection', function (socket) {
       velocity: 2, //originally was 1... 2 might be ideal if boost was implemented
       //Here color will be a random int, and there are 3 colors on the sprite sheet
       color: initColor(),
-      status: true,
+      alive: true,
       path: snakePath,
       path_len: 25,
       boost_level: 100, //double
