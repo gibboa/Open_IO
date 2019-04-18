@@ -166,7 +166,8 @@ function drawBoostMeter(g,id){
 	let h = Math.floor(g.players[id].boost_level);
 	pen.fillText("Boost: (SPACE/SHIFT)", 10, 380);
 	//alert(Math.floor(g.players[id].boost_level) + " was the height");
-	pen.fillRect(40,250+(100-h),20,h);
+	pen.fillStyle = "#ff1c1c";
+	pen.fillRect(70,250+(100-h),20,h);
 }
 
 //Draw the scoreboard
@@ -407,8 +408,9 @@ function initGame(){
 			redrawCanvas(ctx, game, player_ID);
 		}else{
 			//player died and was deleted
-			//alert("you dead");
 			$('game_barrier').style.display = "block";
+			$('name_box').style.diplay = "none";
+			$('game_over_box').style.display = "block";
 		}
 		
 	});

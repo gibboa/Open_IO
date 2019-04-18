@@ -209,6 +209,7 @@ function initSnakeLocations(/*arr,*/ length, direction/*, playersObj*/){
     let x = Math.floor(Math.random() * 320) + 160; //current board is 640px X 640px so
     let y = Math.floor(Math.random() * 320) + 160; //place player randomly between 160px-480px (not too close to edge)
     let tmp_arr = [];
+    console.log("head is " + x + " , " + y + " and dir is " + direction);
     tmp_arr.push([x,y]);
     let i;
     for(i=1; i<length; i++){
@@ -237,6 +238,7 @@ function initSnakeLocations(/*arr,*/ length, direction/*, playersObj*/){
       arr = tmp_arr;
     }
   }//end while
+  console.log("the REAL INITIAL pos_list is " + arr);
   return arr;
 }
 
@@ -257,19 +259,19 @@ function initPath(length, dir, arr){
     //generating points points based on direction, points are 1 px apart
     switch (dir) {
       case 'up':
-        y = y - 1;
-        tmp_path.push([x,y]);
-        break;
-      case 'right':
-        x = x + 1;
-        tmp_path.push([x,y]);
-        break;
-      case 'down':
         y = y + 1;
         tmp_path.push([x,y]);
         break;
-      case 'left':
+      case 'right':
         x = x - 1;
+        tmp_path.push([x,y]);
+        break;
+      case 'down':
+        y = y - 1;
+        tmp_path.push([x,y]);
+        break;
+      case 'left':
+        x = x + 1;
         tmp_path.push([x,y]);
         break;
       }
@@ -437,7 +439,7 @@ setInterval(function(){
             //process each input
             //if input toggles boost:
             if (input[1] == true || input[1] == false){
-              console.log("WE HAVE A T/F input");
+              //console.log("WE HAVE A T/F input");
               game.players[input[0]].boosting = input[1];
               //CHANGING VELOCITY OF PLAYER TEMPORARILY WITHOUT CONSIDER BOOST METER
               //if(game.players[input[0]].boosting){
@@ -498,7 +500,7 @@ io.on('connection', function (socket) {
 
     //on connections generate a random snake for new player
 
-    snakeLen = 4;//set initial length to whatever we want
+    snakeLen = 4;//set initial length to whatever we want 
 
     //first pick a direction at random:
     var snakeDir = initSnakeDirection();
@@ -519,7 +521,7 @@ io.on('connection', function (socket) {
       color: initColor(),
       alive: true,
       path: snakePath,
-      path_len: 25,
+      path_len: (snakeLen*6) + 1, 
       boost_level: 100, //double
       boost_cap: 100,
       boosting: false
