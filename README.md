@@ -1,5 +1,5 @@
 
-![Open IO](open_io_logo.png)
+![Open IO](public/pictures/open_io_logo.png)
 
 
 Open IO is an online multiplayer IO snake game that uses javascript, react, Node.js, and Socket.io
