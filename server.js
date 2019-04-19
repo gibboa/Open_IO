@@ -27,16 +27,29 @@ function checkCollision_Board(p1,g) {
 
 // checkCollision_Player takes two players p1 and p2 and returns true if p1 hits the hitbox of p2
 function checkCollision_Player(p1, p2) {
-  if (p1.alive){
-      console.log("checking if " + pi + " has collided with anything.");
-    for (var i = 0; i < p2.pos_list.length; i++) {
-        console.log("i: " + i);
-      if (check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], p2.pos_list[i][0], p2.pos_list[i][1], 5,5) == true){
+  if (p1.alive && p2.alive) {
+    // first check it was the heads of the snakes that collided
+    // necessary to check separately because orientation matters here
+    if (check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], p2.pos_list[0][0], p2.pos_list[0][1], 5,5)) {
+      if(p1.pos_list[0][0] < p2.pos_list[0][0] && p1.direction == "right" ||
+         p1.pos_list[0][0] > p2.pos_list[0][0] && p1.direction == "left" ||
+         p1.pos_list[0][1] < p2.pos_list[0][1] && p1.direction == "down" ||
+         p1.pos_list[0][1] > p2.pos_list[0][1] && p1.direction == "up")
+      {
+          return true;
+      }
+    }
+    
+    // check the rest of the body for collisions
+    for (var i = 1; i < p2.pos_list.length; i++) {
+        //console.log("i: " + i);
+      if (check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], p2.pos_list[i][0], p2.pos_list[i][1], 5,5) == true) {
         return true;
       }
     }
-    return false;
+    
   }
+  return false;
 }
 
 // checkCollision_Food takes a player p1 and a list of food objects foods and returns true if p1
@@ -76,7 +89,7 @@ function checkGameEvents(p1, g){
     }
   }
   
-  console.log("g.foods.length: " + g.foods.length);
+  //console.log("g.foods.length: " + g.foods.length);
   for (var i = 0; i < g.foods.length; i++) {
       //console.log("apple");
     if (checkCollision_Food(p1, g.foods[i])){
