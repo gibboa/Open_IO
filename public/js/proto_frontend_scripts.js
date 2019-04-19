@@ -30,96 +30,6 @@ function keyToDir(keyCode){
     }
 }
 
-//Function to move snake forward one unit
-//Args: reference to game object
-//Returns: none, changes made to referenced object
-//Requires: game is initialized
-function moveSnakes(game){
-    //stub... latest real version is in server.js right now
-}
-
-// Functions that check whether the current player is colliding with either the gameboard
-// boundaries, any of the other players, or any of the food objects
-
-function check_overlap(x1, y1, x2, y2, rad1, rad2){
-	if ( (x1+rad1 >= x2-rad2 && x1+rad1 <= x2+rad2) || (x1-rad1 <= x2+rad2 && x1+rad1 >= x2-rad2) ) {
-		if ( (y1+rad1 >= y2-rad2 && y1+rad1 <= y2+rad2) || (y1-rad1 <= y2+rad2 && y1-rad1 >= y2-rad2) ){
-			return true;
-		}
-	}
-	return false;
-}
-// checkCollision_Board takes a player p1 and gameboard g and returns true if p1
-// has hit the boundaries of g
-function checkCollision_Board(p1,g) {
-  //console.log("CHECKING");
-	if (p1.pos_list[0][0]+5 >= g.board.x || p1.pos_list[0][1]+5 >= g.board.y) {return true;}
-	else if (p1.pos_list[0][0]-5 <= 0 || p1.pos_list[0][0]-5 <= 0) {return true;}
-	return false;
-}
-
-// checkCollision_Player takes two players p1 and p2 and returns true if p1 hits the hitbox of p2
-function checkCollision_Player(p1, p2) {
-	for (var i = 0; i < p2.pos_list.length; i++) {
-		if (check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], p2.pos_list[i][0], p2.pos_list[i][1], 5,5) == true){
-			return true;
-		}
-	}
-	return false;
-}
-
-// checkCollision_Food takes a player p1 and a list of food objects foods and returns true if p1
-// hits any one of the the objects in foods
-function checkCollision_Food(p1, foods) {
-  if (p1.alive){
-    //console.log("EATING");
-	   return check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], foods.x, foods.y, 5,5);
-  }
-}
-
-
-// ======================================================================================================
-function convertFood(p1, g){
-	for (var i = 0; i < p1.length; i+2) {
-		var food_temp = { x:p1.pos_list[i][0], y:p1.pos_list[i][1] };
-		g.foods.push(food_temp);
-	}
-}
-
-function checkGameEvents(p1, g){
-  //console.log("Checking coll");
-	if (checkCollision_Board(p1, g)){
-    //console.log("deleting player");
-		convertFood(p1,g);
-    p1.alive = false;
-    for (var i = 0; i < g.players.length; i++) {
-      if (g.players[i].playerId == p1.playerId){
-        delete g.players[i];
-      }
-    }
-	}
-
-	for (var i = 0; i < g.players.length; i++) {
-		if (checkCollision_Player(p1,g.players[i])){
-			p1.alive = false;
-			g.players[i].score += 100;
-			convertFood(p1,g);
-      delete g.players[p1];
-		}
-	}
-
-	for (var i = 0; i < g.foods.length; i++) {
-		if (checkCollision_Food(p1, g.foods[i])){
-		    p1.score += 10;
-		    g.foods.splice(i, 1);
-		    p1.path_len += 6;
-		    p1.pos_list.push([p1.path[p1.length*6][0], p1.path[p1.length*6][1]]);
-		    p1.length += 1;
-    	}
-	}
-}
-
-
 //Draw background of canvas using a tile from the style sheet
 //Args: pen, a context from the canvas object
 function drawBG(pen){
@@ -221,7 +131,7 @@ function drawScores(g){
 		let tmp_str = "#" + count.toString(10);
 		pen.fillText( tmp_str, 15, y_offset);
 		//add a way to cut off the name if it's too long
-		pen.fillText( tmp_array[i].name, 45, y_offset);
+		pen.fillText( tmp_array[i].name.slice(0,15), 45, y_offset);
 		pen.fillText( tmp_array[i].score, 150, y_offset);
 		y_offset += 20;
 		count += 1;
@@ -404,14 +314,21 @@ function initGame(){
 	socket.on('authoritativeUpdate', function(data){
 		//somehow update entire local gamestate with (data is the game obj here)
 		game = data;//probly need to do deep copy, doubt this works
+		redrawCanvas(ctx, game, player_ID);//temporary while debugging
+		/*TEMPORARILY REMOVING TO ISOLATE BUG
 		if(player_ID in game.players){
 			redrawCanvas(ctx, game, player_ID);
+			//if(!game.players[player_ID].alive){
+				//$('game_barrier').style.display = "block";
+				//$('name_box').style.diplay = "none";
+				//$('game_over_box').style.display = "block";
+			//}
 		}else{
 			//player died and was deleted
 			$('game_barrier').style.display = "block";
 			$('name_box').style.diplay = "none";
 			$('game_over_box').style.display = "block";
-		}
+		}*/
 		
 	});
 
