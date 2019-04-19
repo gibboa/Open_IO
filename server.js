@@ -92,7 +92,32 @@ function checkCollision_Food(p1, foods) {
 function convertFood(p1, g){
   for (var i = 1; i < p1.length; i+=2) {
     let food_temp = { x:p1.pos_list[i][0], y:p1.pos_list[i][1] };
-    g.foods.push(food_temp);
+    let locationsNotValidated = true;
+    while(locationsNotValidated){
+      let fx = food_temp.x;
+      let fy = food_temp.y;
+      let currFoodValid = true
+      for(let i=0; i<g.foods.length; i++){
+        if(check_overlap(fx, fy, g.foods[i].x, g.foods[i].y, 5,5)){//could be 5,5
+          currFoodValid = false;
+        }
+      }
+      /*//check for spawning on top of players ... leaving this out unless it causes a bug
+      for(let k in g.players){
+        for(let i=0; i<g.players[k].pos_list.length; i++){
+          if(check_overlap(fx, fy, g.players[k].pos_list[i].x, g.players[k].pos_list[i].y, 6,6)){
+            currFoodValid = false;
+          }
+        }
+      }*/
+      if(currFoodValid){
+        g.foods.push({x:fx, y:fy});
+      }
+      if(g.foods.length >= 10){
+        locationsNotValidated = false;
+      }
+    }//END WHILE
+    //g.foods.push(food_temp);
   }
 }
 
@@ -575,7 +600,7 @@ io.on('connection', function (socket) {
       color: initColor(),
       alive: true,
       path: snakePath,
-      path_len: (snakeLen*6) + 1, 
+      path_len: (snakeLen*6) + 12, //WAS + 1, now its +11 to add some extra breathing room 
       boost_level: 100, //double
       boost_cap: 100,
       boosting: false
@@ -588,6 +613,8 @@ io.on('connection', function (socket) {
       //logs for testing:
   		//console.log('player name, ' + data.playerName + ' recieved from ' + socket.id +', updating player object');
   		console.log('Player ' + socket.id + ' name updated to ' + game.players[socket.id].name);
+      console.log('length: ' + game.players[socket.id].length + ' path_len: ' + game.players[socket.id].path_len);
+      console.log('length of pos list: ' +game.players[socket.id].pos_list.length+ ' length of path array: ' +game.players[socket.id].path.length);
 		  //console.log(game.players[socket.id].name + "'s initial direction is: " + game.players[socket.id].direction );
 		  //console.log(game.players[socket.id].name, "location array is:", game.players[socket.id].pos_list);
 
