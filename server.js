@@ -28,7 +28,9 @@ function checkCollision_Board(p1,g) {
 // checkCollision_Player takes two players p1 and p2 and returns true if p1 hits the hitbox of p2
 function checkCollision_Player(p1, p2) {
   if (p1.alive){
+      console.log("checking if " + pi + " has collided with anything.");
     for (var i = 0; i < p2.pos_list.length; i++) {
+        console.log("i: " + i);
       if (check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], p2.pos_list[i][0], p2.pos_list[i][1], 5,5) == true){
         return true;
       }
@@ -56,30 +58,35 @@ function convertFood(p1, g){
 
 function checkGameEvents(p1, g){
   if (checkCollision_Board(p1, g)) {
-      console.log("q\n");
+      //console.log("q");
     p1.alive = false;
     delete g.players[p1.playerId];
     convertFood(p1,g);
   }
 
+  console.log("g.players.length: " + g.players.length);
   for (var i = 0; i < g.players.length; i++) {
+      console.log("checkGameEvents i: " + i);
     if (checkCollision_Player(p1,g.players[i])){
+        console.log("hit");
       p1.alive = false;
       delete g.players[p1.playerId];
       g.players[i].score += 100;
       convertFood(p1,g);
+      break;
     }
   }
 
   for (var i = 0; i < g.foods.length; i++) {
+      //console.log("apple");
     if (checkCollision_Food(p1, g.foods[i])){
       p1.score += 10;
       g.foods.splice(i, 1);
       p1.path_len += 12;//changed from 6 to mitigate overeating bug...
       //unfortunately this will grow our array far beyond what we need
       //pretty sure this is an upper bound, there are more efficient solutions...
-      console.log("p1.length: " + p1.length + " * 6 = " + (p1.path[p1.length*6]));
-      console.log("p1.path[p1.length*6][0]: " + p1.path[p1.length*6][0]);
+      //console.log("p1.length: " + p1.length + " * 6 = " + (p1.path[p1.length*6]));
+      //console.log("p1.path[p1.length*6][0]: " + p1.path[p1.length*6][0]);
       
       p1.pos_list.push([p1.path[p1.length*6][0], p1.path[p1.length*6][1]]);
       p1.length += 1;
@@ -250,7 +257,7 @@ function initSnakeLocations(/*arr,*/ length, direction/*, playersObj*/){
 //Requires: snakes pos_list has been initialized
 //Args: snake length, direction, pos_list of snake
 //Returns: array of coords (a path the snake as traveled and which
-//body segments must travel to follow the head)
+//body segments must travel to follow the head)changed direction to
 function initPath(length, dir, arr){
   var tmp_path = [];
   let i;
@@ -370,7 +377,7 @@ function updateBoosts(){
       //increase boos meter
       game.players[key].boost_level += 0.5;
     }
-    console.log("boost level is " + game.players[key].boost_level)
+    //console.log("boost level is " + game.players[key].boost_level)
     if(game.players[key].boost_level > game.players[key].boost_cap){
       game.players[key].boost_level = game.players[key].boost_cap;
     }
@@ -562,7 +569,7 @@ io.on('connection', function (socket) {
   	socket.on('playerMovement', function(data){
   		//naive implementation would just send updated gamestate to all players right here
       //test code:
-  		console.log('player', socket.id, 'changed direction to', data.input);
+  		//console.log('player', socket.id, 'changed direction to', data.input);
   		io.sockets.emit('gameStateUpdate', game.players[socket.id].name + "'s direction changed...");
 
       inputQueue.unshift([socket.id, data.input]);//data.input is a number (key code)
@@ -573,7 +580,7 @@ io.on('connection', function (socket) {
   	});
 
     socket.on('playerBoost', function(data){
-      console.log("BOOST MSG RECIEVED");
+      //console.log("BOOST MSG RECIEVED");
       inputQueue.unshift([socket.id, data.input]);//data.input is bool, true/false
     });
 
