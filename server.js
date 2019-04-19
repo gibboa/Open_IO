@@ -27,18 +27,45 @@ function checkCollision_Board(p1,g) {
 
 // checkCollision_Player takes two players p1 and p2 and returns true if p1 hits the hitbox of p2
 function checkCollision_Player(p1, p2) {
-  if (p1.alive && p2.alive) {
+  if (p1.alive) {
     // first check it was the heads of the snakes that collided
     // necessary to check separately because orientation matters here
-    if (check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], p2.pos_list[0][0], p2.pos_list[0][1], 5,5)) {
-      if(p1.pos_list[0][0] < p2.pos_list[0][0] && p1.direction == "right" ||
-         p1.pos_list[0][0] > p2.pos_list[0][0] && p1.direction == "left" ||
-         p1.pos_list[0][1] < p2.pos_list[0][1] && p1.direction == "down" ||
-         p1.pos_list[0][1] > p2.pos_list[0][1] && p1.direction == "up")
-      {
+    //if (check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], p2.pos_list[0][0], p2.pos_list[0][1], 5,5)) {
+    //    if(p1.pos_list[0][0] < p2.pos_list[0][0] && p1.direction == "right" && p2.direction == "left" ||
+    //       p1.pos_list[0][0] > p2.pos_list[0][0] && p1.direction == "left" && p2.direction == "right" ||
+    //       p1.pos_list[0][1] < p2.pos_list[0][1] && p1.direction == "down" && p1.direction == "up" ||
+    //       p1.pos_list[0][1] > p2.pos_list[0][1] && p1.direction == "up" && p1.direction == "down")
+    //    {
+    //      return true;
+    //  }
+    //}
+    
+    if(p2.alive) {
+      // if player 2 is still alive, all that matters is if we hit them, so check that the relative
+      // coordinates and orientations line up
+      if (check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], p2.pos_list[0][0], p2.pos_list[0][1], 5,5)) {
+        if(p1.pos_list[0][0] < p2.pos_list[0][0] && p1.direction == "right" ||
+           p1.pos_list[0][0] > p2.pos_list[0][0] && p1.direction == "left" ||
+           p1.pos_list[0][1] < p2.pos_list[0][1] && p1.direction == "down" ||
+           p1.pos_list[0][1] > p2.pos_list[0][1] && p1.direction == "up")
+        {
           return true;
+        }
+      }
+    } else {
+      // if the other player *isn't* alive, we only die if the collision was head-on
+      // therefore we add an extra element to the conditional to check that that's what happened
+      if (check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], p2.pos_list[0][0], p2.pos_list[0][1], 5,5)) {
+        if(p1.pos_list[0][0] < p2.pos_list[0][0] && p1.direction == "right" && p2.direction == "left" ||
+           p1.pos_list[0][0] > p2.pos_list[0][0] && p1.direction == "left" && p2.direction == "right" ||
+           p1.pos_list[0][1] < p2.pos_list[0][1] && p1.direction == "down" && p2.direction == "up"  ||
+           p1.pos_list[0][1] > p2.pos_list[0][1] && p1.direction == "up" && p2.direction == "down")
+        {
+          return true;
+        }
       }
     }
+    
     
     // check the rest of the body for collisions
     for (var i = 1; i < p2.pos_list.length; i++) {
