@@ -64,6 +64,7 @@ function checkGameEvents(p1, g){
     convertFood(p1,g);
   }
 
+  console.log("g.players: " + g.players.toString());
   console.log("g.players.length: " + g.players.length);
   for (var i = 0; i < g.players.length; i++) {
       console.log("checkGameEvents i: " + i);
@@ -76,7 +77,8 @@ function checkGameEvents(p1, g){
       break;
     }
   }
-
+  
+  console.log("g.foods.length: " + g.foods.length);
   for (var i = 0; i < g.foods.length; i++) {
       //console.log("apple");
     if (checkCollision_Food(p1, g.foods[i])){
