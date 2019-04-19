@@ -470,7 +470,7 @@ setInterval(function(){
           //console.log("their path_len is " + game.players[key].paht_len + " their path has a len " + game.players[key].path.length);
         }
         if (game.foods){
-        console.log("last two food locs are: ( "+ game.foods[game.foods.length - 1].x +" , " + game.foods[game.foods.length - 1].y + " ) ( "+ game.foods[game.foods.length - 2].x +" , " + game.foods[game.foods.length - 2].y + " )");
+        //console.log("last two food locs are: ( "+ game.foods[game.foods.length - 1].x +" , " + game.foods[game.foods.length - 1].y + " ) ( "+ game.foods[game.foods.length - 2].x +" , " + game.foods[game.foods.length - 2].y + " )");
         }//END DEBUG CODE
     } 
 
