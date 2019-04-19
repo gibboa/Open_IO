@@ -27,14 +27,56 @@ function checkCollision_Board(p1,g) {
 
 // checkCollision_Player takes two players p1 and p2 and returns true if p1 hits the hitbox of p2
 function checkCollision_Player(p1, p2) {
-  if (p1.alive){
-    for (var i = 0; i < p2.pos_list.length; i++) {
-      if (check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], p2.pos_list[i][0], p2.pos_list[i][1], 5,5) == true){
+  if (p1.alive) {
+    // first check it was the heads of the snakes that collided
+    // necessary to check separately because orientation matters here
+    //if (check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], p2.pos_list[0][0], p2.pos_list[0][1], 5,5)) {
+    //    if(p1.pos_list[0][0] < p2.pos_list[0][0] && p1.direction == "right" && p2.direction == "left" ||
+    //       p1.pos_list[0][0] > p2.pos_list[0][0] && p1.direction == "left" && p2.direction == "right" ||
+    //       p1.pos_list[0][1] < p2.pos_list[0][1] && p1.direction == "down" && p1.direction == "up" ||
+    //       p1.pos_list[0][1] > p2.pos_list[0][1] && p1.direction == "up" && p1.direction == "down")
+    //    {
+    //      return true;
+    //  }
+    //}
+    
+    if(p2.alive) {
+      // if player 2 is still alive, all that matters is if we hit them, so check that the relative
+      // coordinates and orientations line up
+      if (check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], p2.pos_list[0][0], p2.pos_list[0][1], 5,5)) {
+        if(p1.pos_list[0][0] < p2.pos_list[0][0] && p1.direction == "right" ||
+           p1.pos_list[0][0] > p2.pos_list[0][0] && p1.direction == "left" ||
+           p1.pos_list[0][1] < p2.pos_list[0][1] && p1.direction == "down" ||
+           p1.pos_list[0][1] > p2.pos_list[0][1] && p1.direction == "up")
+        {
+          return true;
+        }
+      }
+    } else {
+      // if the other player *isn't* alive, we only die if the collision was head-on
+      // therefore we add an extra element to the conditional to check that that's what happened
+      if (check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], p2.pos_list[0][0], p2.pos_list[0][1], 5,5)) {
+        if(p1.pos_list[0][0] < p2.pos_list[0][0] && p1.direction == "right" && p2.direction == "left" ||
+           p1.pos_list[0][0] > p2.pos_list[0][0] && p1.direction == "left" && p2.direction == "right" ||
+           p1.pos_list[0][1] < p2.pos_list[0][1] && p1.direction == "down" && p2.direction == "up"  ||
+           p1.pos_list[0][1] > p2.pos_list[0][1] && p1.direction == "up" && p2.direction == "down")
+        {
+          return true;
+        }
+      }
+    }
+    
+    
+    // check the rest of the body for collisions
+    for (var i = 1; i < p2.pos_list.length; i++) {
+        //console.log("i: " + i);
+      if (check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], p2.pos_list[i][0], p2.pos_list[i][1], 5,5) == true) {
         return true;
       }
     }
-    return false;
+    
   }
+  return false;
 }
 
 // checkCollision_Food takes a player p1 and a list of food objects foods and returns true if p1
@@ -55,13 +97,14 @@ function convertFood(p1, g){
 }
 
 function checkGameEvents(p1, g){
-  if (checkCollision_Board(p1, g)){
+  if (checkCollision_Board(p1, g)) {
+      //console.log("q");
     p1.alive = false;
     //delete g.players[p1.playerId];
     convertFood(p1,g);
   }
 
-  for (let id in g.players) {
+    for (let id in g.players) {
     if(p1.playerId != g.players[id].playerId){
       if (checkCollision_Player(p1,g.players[id])){
         //console.log("THERE WAS A COLLISION");
@@ -72,14 +115,19 @@ function checkGameEvents(p1, g){
       }
     }
   }
-
+  
+  //console.log("g.foods.length: " + g.foods.length);
   for (var i = 0; i < g.foods.length; i++) {
+      //console.log("apple");
     if (checkCollision_Food(p1, g.foods[i])){
       p1.score += 10;
       g.foods.splice(i, 1);
       p1.path_len += 12;//changed from 6 to mitigate overeating bug...
       //unfortunately this will grow our array far beyond what we need
       //pretty sure this is an upper bound, there are more efficient solutions...
+      //console.log("p1.length: " + p1.length + " * 6 = " + (p1.path[p1.length*6]));
+      //console.log("p1.path[p1.length*6][0]: " + p1.path[p1.length*6][0]);
+      
       p1.pos_list.push([p1.path[p1.length*6][0], p1.path[p1.length*6][1]]);
       p1.length += 1;
       if(g.foods.length < 10){
@@ -259,7 +307,7 @@ function initSnakeLocations(/*arr,*/ length, direction, g){
 //Requires: snakes pos_list has been initialized
 //Args: snake length, direction, pos_list of snake
 //Returns: array of coords (a path the snake as traveled and which
-//body segments must travel to follow the head)
+//body segments must travel to follow the head)changed direction to
 function initPath(length, dir, arr){
   var tmp_path = [];
   let i;
@@ -314,7 +362,7 @@ function moveSnakes(){
         }else{//left
             change_x = -1 * game.players[key].velocity;
         }
-
+        
         //move head of snake
         game.players[key].pos_list[0][0] += change_x;
         game.players[key].pos_list[0][1] += change_y;
@@ -415,6 +463,7 @@ var update_count = 0; //global var to trigger authoritative updates
 setInterval(function(){
   //console.log("in the udpate loop" + " the counter is " + update_count);
     //NOTE: node is not multithreaded so the queue is safe within the scope of this function
+    //console.log("game: " + game.toString());
     if(game){
       //console.log("game is set");
 
@@ -477,15 +526,16 @@ setInterval(function(){
             //io.sockets.emit('authoritativeUpdate', game);
             update_count = 0;
         }
+        
         //DEBUG CODE
-        //for(let key in game.players){
+        for(let key in game.players){
           //console.log("player name: " + game.players[key].name + " has a length of " + game.players[key].length);
           //console.log("their path_len is " + game.players[key].paht_len + " their path has a len " + game.players[key].path.length);
-        //}
-        //if (game.foods){
+        }
+        if (game.foods){
         //console.log("last two food locs are: ( "+ game.foods[game.foods.length - 1].x +" , " + game.foods[game.foods.length - 1].y + " ) ( "+ game.foods[game.foods.length - 2].x +" , " + game.foods[game.foods.length - 2].y + " )");
-        //}//END DEBUG CODE
-    }
+        }//END DEBUG CODE
+    } 
 
 }, 1000/15);// call func every 15 ms
 
@@ -550,7 +600,7 @@ io.on('connection', function (socket) {
   	socket.on('playerMovement', function(data){
   		//naive implementation would just send updated gamestate to all players right here
       //test code:
-      if(game.players[socket.id]){
+        if(game.players[socket.id]){
         //console.log('player', socket.id, 'changed direction to', data.input);
         io.sockets.emit('gameStateUpdate', game.players[socket.id].name + "'s direction changed...");
 
