@@ -20,7 +20,7 @@ function check_overlap(x1, y1, x2, y2, rad1, rad2){
 function checkCollision_Board(p1,g) {
   if (p1.alive){
     if (p1.pos_list[0][0]+5 >= g.board.x || p1.pos_list[0][1]+5 >= g.board.y) {return true;}
-    else if (p1.pos_list[0][0]-5 <= 0 || p1.pos_list[0][0]-5 <= 0) {return true;}
+    else if (p1.pos_list[0][0]-5 <= 0 || p1.pos_list[0][1]-5 <= 0) {return true;}
     return false;
   }
 }
@@ -124,10 +124,10 @@ function initSnakeDirection(){
 }
 
 //Function to randomly select color/skin of snake
-//Returns an int 1,2,3 since there are only three skins right now
+//Returns an int 1,2,...10 since there are 10 skins right now
 //Args: none
 function initColor(){
-  return Math.floor(Math.random() * Math.floor(3)) + 1
+  return Math.floor(Math.random() * Math.floor(10)) + 1
 }
 
 
@@ -440,7 +440,11 @@ setInterval(function(){
             //if input toggles boost:
             if (input[1] == true || input[1] == false){
               //console.log("WE HAVE A T/F input");
-              game.players[input[0]].boosting = input[1];
+              if(input[0] in game.players){
+                if(game.players[input[0]].alive){
+                  game.players[input[0]].boosting = input[1];
+                }
+              }
               //CHANGING VELOCITY OF PLAYER TEMPORARILY WITHOUT CONSIDER BOOST METER
               //if(game.players[input[0]].boosting){
                 //game.players[input[0]].velocity = 5;
@@ -449,7 +453,11 @@ setInterval(function(){
               //}
 
             }else{//input changes direction
-              game.players[input[0]].direction = keyToDir(input[1]);
+              if(input[0] in game.players){
+                if(game.players[input[0]].alive){
+                  game.players[input[0]].direction = keyToDir(input[1]);
+                }
+              }
             }
         }
 
