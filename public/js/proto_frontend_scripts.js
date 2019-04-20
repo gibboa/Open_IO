@@ -202,12 +202,14 @@ var player_ID = '';//stores ID of this player assigned by server
 //that the server add them to the game
 function initGame(){
 
+	//var game;
 	//maybe dont need this but w/e
-	var game = {
-	    players: {},
-	    foods: [],
-	    board: {x: 640, y: 640}
-	};
+	//var game = {
+	   // players: {},
+	    //foods: [],
+	    //board: {x: 640, y: 640}
+	    //name2id: {}
+	//};
 	//because this element is a text field, .value will store the users input in our variable
     var name= $('player_name').value;
     //alert('hi ' + name + ' the game would be starting now if it existed');
@@ -219,7 +221,7 @@ function initGame(){
 
 	drawBG(ctx);
 	drawScores();
-	x= 7;
+	
 	//Establishing Connection to Game Server
 	var socket = io.connect(document.location.origin);
 	socket.on('connect', function(){
@@ -232,7 +234,7 @@ function initGame(){
 
 	//listen for message containing clients own ID
 	socket.on('passID', function(data){
-		player_ID = data;
+		player_ID = data.name2id[name];
 		//alert("you socket id on server is:" + player_ID);
 	});
 
@@ -314,35 +316,22 @@ function initGame(){
 	socket.on('authoritativeUpdate', function(data){
 		//somehow update entire local gamestate with (data is the game obj here)
 		game = data;//probly need to do deep copy, doubt this works
-		redrawCanvas(ctx, game, player_ID);//temporary while debugging
-		/*TEMPORARILY REMOVING TO ISOLATE BUG
+		//redrawCanvas(ctx, game, player_ID);//temporary while debugging
+		//TEMPORARILY REMOVING TO ISOLATE BUG
 		if(player_ID in game.players){
 			redrawCanvas(ctx, game, player_ID);
-			//if(!game.players[player_ID].alive){
-				//$('game_barrier').style.display = "block";
-				//$('name_box').style.diplay = "none";
-				//$('game_over_box').style.display = "block";
-			//}
+			if(!game.players[player_ID].alive){
+				$('game_barrier').style.display = "block";
+				$('name_box').style.diplay = "none";
+				$('game_over_box').style.display = "block";
+			}
 		}else{
 			//player died and was deleted
 			$('game_barrier').style.display = "block";
 			$('name_box').style.diplay = "none";
 			$('game_over_box').style.display = "block";
-		}*/
+		}
 		
 	});
 
-}
-
-//update has two phases:
-//	1. update gamestate data based on any changes offered by the server
-//	2. redraw game using the updated gamestate
-function update(){
-	//x = x + 10;
-	//alert("in the update" + x);
-	//DOESNT WORK HERE...might be nice if it did though... maybe a scope issue?
-	//listing for messages concerning 'gameStateUpdate'
-	//socket.on('gameStateUpdate', function(data){
-		//alert("received something from server to update gamestate");
-	//});
 }

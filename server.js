@@ -125,8 +125,9 @@ function checkGameEvents(p1, g){
   if (checkCollision_Board(p1, g)) {
       //console.log("q");
     p1.alive = false;
-    //delete g.players[p1.playerId];
+    delete g.players[p1.playerId];
     convertFood(p1,g);
+    return;
   }
 
     for (let id in g.players) {
@@ -134,9 +135,10 @@ function checkGameEvents(p1, g){
       if (checkCollision_Player(p1,g.players[id])){
         //console.log("THERE WAS A COLLISION");
         p1.alive = false;
-        //delete g.players[p1.playerId];
+        delete g.players[p1.playerId];
         g.players[id].score += 100;
         convertFood(p1,g);
+        return;
       }
     }
   }
@@ -457,7 +459,8 @@ function updateBoosts(){
 var game = {
     players: {},
     foods: [],
-    board: {x: 640, y: 640}
+    board: {x: 640, y: 640},
+    name2id: {}
 };
 
 initFoods(game);
@@ -537,11 +540,11 @@ setInterval(function(){
         for(let id in game.players){
           checkGameEvents(game.players[id], game);
         }
-        for(let id in game.players){//separating deletes... they only happen here now
-          if(!game.players[id].alive){
-            delete game.players[id];
-          }
-        }
+        //for(let id in game.players){//separating deletes... they only happen here now
+          //if(!game.players[id].alive){
+            //delete game.players[id];
+          //}
+        //}
 
         //THIS IS IMPORTANT But i want to speed it up w/o breaking stuff, temporarily moving emit out of if
         io.sockets.emit('authoritativeUpdate', game);
@@ -575,7 +578,8 @@ io.on('connection', function (socket) {
 
   	console.log('a user connected with socket id: ' + socket.id );
     //let the player know what its ID is in the game obj
-    io.sockets.emit('passID', socket.id);
+    //io.sockets.emit('passID', socket.id);
+    //socket.broadcast.to(socket.id).emit('passID', socket.id);
 
     //on connections generate a random snake for new player
 
@@ -609,44 +613,31 @@ io.on('connection', function (socket) {
   	socket.on('initPlayer', function(data){//initPlayer emitted after player recieves CONNACK
   		//change name in player object
   		game.players[socket.id].name = data.playerName;//data.playerName is incomeing info from client
-
+      game.name2id[data.playerName] = socket.id;
+      io.sockets.emit('passID', game);
       //logs for testing:
   		//console.log('player name, ' + data.playerName + ' recieved from ' + socket.id +', updating player object');
-  		console.log('Player ' + socket.id + ' name updated to ' + game.players[socket.id].name);
-      console.log('length: ' + game.players[socket.id].length + ' path_len: ' + game.players[socket.id].path_len);
-      console.log('length of pos list: ' +game.players[socket.id].pos_list.length+ ' length of path array: ' +game.players[socket.id].path.length);
+  		//console.log('Player ' + socket.id + ' name updated to ' + game.players[socket.id].name);
+      //console.log('length: ' + game.players[socket.id].length + ' path_len: ' + game.players[socket.id].path_len);
+      //console.log('length of pos list: ' +game.players[socket.id].pos_list.length+ ' length of path array: ' +game.players[socket.id].path.length);
 		  //console.log(game.players[socket.id].name + "'s initial direction is: " + game.players[socket.id].direction );
 		  //console.log(game.players[socket.id].name, "location array is:", game.players[socket.id].pos_list);
-
   	});
-
-  	//update all other players of the new player
-  	//socket.broadcast.emit('newPlayer', players[socket.id]);
 
   	//when the client emits a 'playerMovement' msg we catch the data here
   	socket.on('playerMovement', function(data){
   		//naive implementation would just send updated gamestate to all players right here
       //test code:
-        if(game.players[socket.id]){
+      if(game.players[socket.id]){
         //console.log('player', socket.id, 'changed direction to', data.input);
-        io.sockets.emit('gameStateUpdate', game.players[socket.id].name + "'s direction changed...");
-
+        //io.sockets.emit('gameStateUpdate', game.players[socket.id].name + "'s direction changed...");
         inputQueue.unshift([socket.id, data.input]);//data.input is a number (key code)
       }
-  		
-
-		// Send message to game server
-		//game_serv.message("playerMovement", data);
-
   	});
 
     socket.on('playerBoost', function(data){
-      //console.log("BOOST MSG RECIEVED");
       inputQueue.unshift([socket.id, data.input]);//data.input is bool, true/false
     });
-
-  	//send the players object to the new player
-  	//socket.emit('currentPlayers', players);
 
   	socket.on('disconnect', function () {
     	console.log('user '+ socket.id +' disconnected');
