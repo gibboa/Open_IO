@@ -196,18 +196,22 @@ function redrawCanvas(pen, game, id){
 var inputQueue = [];
 
 var player_ID = '';//stores ID of this player assigned by server
+
+var IDpassed = false;//has the player recieved its ID from the server yet?
 //initGame()
 //This function is called when the player clicks the Play button...
 //It should begin the game for them changing the display and requesting
 //that the server add them to the game
 function initGame(){
 
+	//var game;
 	//maybe dont need this but w/e
-	var game = {
-	    players: {},
-	    foods: [],
-	    board: {x: 640, y: 640}
-	};
+	//var game = {
+	   // players: {},
+	    //foods: [],
+	    //board: {x: 640, y: 640}
+	    //name2id: {}
+	//};
 	//because this element is a text field, .value will store the users input in our variable
     var name= $('player_name').value;
     //alert('hi ' + name + ' the game would be starting now if it existed');
@@ -219,7 +223,7 @@ function initGame(){
 
 	drawBG(ctx);
 	drawScores();
-	x= 7;
+	
 	//Establishing Connection to Game Server
 	var socket = io.connect(document.location.origin);
 	socket.on('connect', function(){
@@ -232,7 +236,8 @@ function initGame(){
 
 	//listen for message containing clients own ID
 	socket.on('passID', function(data){
-		player_ID = data;
+		player_ID = data.name2id[name];
+		IDpassed = true;
 		//alert("you socket id on server is:" + player_ID);
 	});
 
@@ -314,35 +319,29 @@ function initGame(){
 	socket.on('authoritativeUpdate', function(data){
 		//somehow update entire local gamestate with (data is the game obj here)
 		game = data;//probly need to do deep copy, doubt this works
-		redrawCanvas(ctx, game, player_ID);//temporary while debugging
-		/*TEMPORARILY REMOVING TO ISOLATE BUG
-		if(player_ID in game.players){
+		//redrawCanvas(ctx, game, player_ID);//temporary while debugging
+		//TEMPORARILY REMOVING TO ISOLATE BUG
+		if(IDpassed){
+			if(player_ID in game.players){
 			redrawCanvas(ctx, game, player_ID);
-			//if(!game.players[player_ID].alive){
-				//$('game_barrier').style.display = "block";
-				//$('name_box').style.diplay = "none";
-				//$('game_over_box').style.display = "block";
-			//}
+			if(!game.players[player_ID].alive){
+				$('game_barrier').style.display = "block";
+				$('name_box').style.diplay = "none";
+				$('game_over_box').style.display = "block";
+			}
+			}else{
+				//player died and was deleted
+				$('game_barrier').style.display = "block";
+				$('name_box').style.diplay = "none";
+				$('game_over_box').style.display = "block";
+			}
 		}else{
-			//player died and was deleted
-			$('game_barrier').style.display = "block";
-			$('name_box').style.diplay = "none";
-			$('game_over_box').style.display = "block";
-		}*/
+			//boost will not be drawn, but at least the refresh screen won't open on a new
+			//player that hasnt recieved its ID yet
+			redrawCanvas(ctx, game, player_ID);
+		}
+		
 		
 	});
 
-}
-
-//update has two phases:
-//	1. update gamestate data based on any changes offered by the server
-//	2. redraw game using the updated gamestate
-function update(){
-	//x = x + 10;
-	//alert("in the update" + x);
-	//DOESNT WORK HERE...might be nice if it did though... maybe a scope issue?
-	//listing for messages concerning 'gameStateUpdate'
-	//socket.on('gameStateUpdate', function(data){
-		//alert("received something from server to update gamestate");
-	//});
 }
