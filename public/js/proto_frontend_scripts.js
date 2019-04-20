@@ -196,6 +196,8 @@ function redrawCanvas(pen, game, id){
 var inputQueue = [];
 
 var player_ID = '';//stores ID of this player assigned by server
+
+var IDpassed = false;//has the player recieved its ID from the server yet?
 //initGame()
 //This function is called when the player clicks the Play button...
 //It should begin the game for them changing the display and requesting
@@ -235,6 +237,7 @@ function initGame(){
 	//listen for message containing clients own ID
 	socket.on('passID', function(data){
 		player_ID = data.name2id[name];
+		IDpassed = true;
 		//alert("you socket id on server is:" + player_ID);
 	});
 
@@ -318,19 +321,26 @@ function initGame(){
 		game = data;//probly need to do deep copy, doubt this works
 		//redrawCanvas(ctx, game, player_ID);//temporary while debugging
 		//TEMPORARILY REMOVING TO ISOLATE BUG
-		if(player_ID in game.players){
+		if(IDpassed){
+			if(player_ID in game.players){
 			redrawCanvas(ctx, game, player_ID);
 			if(!game.players[player_ID].alive){
 				$('game_barrier').style.display = "block";
 				$('name_box').style.diplay = "none";
 				$('game_over_box').style.display = "block";
 			}
+			}else{
+				//player died and was deleted
+				$('game_barrier').style.display = "block";
+				$('name_box').style.diplay = "none";
+				$('game_over_box').style.display = "block";
+			}
 		}else{
-			//player died and was deleted
-			$('game_barrier').style.display = "block";
-			$('name_box').style.diplay = "none";
-			$('game_over_box').style.display = "block";
+			//boost will not be drawn, but at least the refresh screen won't open on a new
+			//player that hasnt recieved its ID yet
+			redrawCanvas(ctx, game, player_ID);
 		}
+		
 		
 	});
 

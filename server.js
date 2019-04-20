@@ -125,6 +125,7 @@ function checkGameEvents(p1, g){
   if (checkCollision_Board(p1, g)) {
       //console.log("q");
     p1.alive = false;
+    delete g.name2id[p1.name];
     delete g.players[p1.playerId];
     convertFood(p1,g);
     return;
@@ -135,6 +136,7 @@ function checkGameEvents(p1, g){
       if (checkCollision_Player(p1,g.players[id])){
         //console.log("THERE WAS A COLLISION");
         p1.alive = false;
+        delete g.name2id[p1.name];
         delete g.players[p1.playerId];
         g.players[id].score += 100;
         convertFood(p1,g);
@@ -463,6 +465,9 @@ var game = {
     name2id: {}
 };
 
+var ids2names = {};//servers own record of names and ids for all players
+//used to access info after players are deleted
+
 initFoods(game);
 
 //var game_serv = {};
@@ -615,6 +620,7 @@ io.on('connection', function (socket) {
   		game.players[socket.id].name = data.playerName;//data.playerName is incomeing info from client
       game.name2id[data.playerName] = socket.id;
       io.sockets.emit('passID', game);
+      ids2names[socket.io] = data.playerName;
       //logs for testing:
   		//console.log('player name, ' + data.playerName + ' recieved from ' + socket.id +', updating player object');
   		//console.log('Player ' + socket.id + ' name updated to ' + game.players[socket.id].name);
@@ -642,7 +648,9 @@ io.on('connection', function (socket) {
   	socket.on('disconnect', function () {
     	console.log('user '+ socket.id +' disconnected');
     	//remove this player from our players object
+      delete game.name2id[ids2names[socket.id]];
     	delete game.players[socket.id];
+      delete ids2names[socket.id];
     	io.emit('disconnect', socket.id);
   	});
 
