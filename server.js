@@ -159,7 +159,7 @@ function checkGameEvents(p1, g){
       
       p1.pos_list.push([p1.path[p1.length*6][0], p1.path[p1.length*6][1]]);
       p1.length += 1;
-      if(g.foods.length < 10){
+      if(g.foods.length < 20){
         addFood(g);
       }
     }
@@ -236,7 +236,7 @@ function addFood(g){
     if(currFoodValid){
       g.foods.push({x:fx, y:fy});
     }
-    if(g.foods.length >= 10){
+    if(g.foods.length >= 20){
       locationsNotValidated = false;
     }
   }
@@ -263,7 +263,7 @@ function initFoods(g){
     if(currFoodValid){
       arr.push({x:fx, y:fy});
     }
-    if(arr.length >= 10){
+    if(arr.length >= 20){
       locationsNotValidated = false;
     }
   }
