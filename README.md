@@ -1,13 +1,15 @@
 
 ![Open IO](public/pictures/open_io_logo.png)
 
+Open IO provides an open-source solution to easily developing simple online multiplayer .IO games, such as slither.io and agar.io. Our current implementation of Open IO (available soon to play) draws inspiration from the classic game of snake. Using JavaScript, Node.js, HTML5 Canvas, CSS, Express, and Socket.io, we developed the foundational code to help developers create .IO games. Additionally, we have created a game that uses this foundational code, to show the power of Open IO.
 
-Open IO is an online multiplayer IO snake game that uses javascript, react, Node.js, and Socket.io
 
-# Resources
+# Important Links
 Blog: https://rcos.io/projects/gibboa/open_io/blog <br/>
-Website: https://rcos.io/projects/gibboa/open_io/profile <br/>
+Website: https://cutt.ly/openio <br/>
+RCOS Page: https://rcos.io/projects/gibboa/open_io/profile <br/>
 Repository: https://github.com/gibboa/Open_IO <br/>
+Contact: openiosnake@gmail.com <br/>
 
 # Learning javascript, react, Node.js, and Socket.io
 The Basics (Youtube Playlist): <br/> 
@@ -59,7 +61,10 @@ visit out [Learning Resources](https://github.com/gibboa/Open_IO/tree/master/Lea
 	$ sudo pacman -S nodejs npm
 
 2. Check if Node.js and npm are successfully installed. <br/>
-	If successfully installed, running "node -v" in Terminal will show your version of Node and running "npm -v" will show your version of npm (your version should be different than the one in the image).
+	If successfully installed, running "node -v" in Terminal will show your version of Node and running "npm -v" will show your version of npm (your version should be different than the one in the image). 
+
+3. Setup unit testing setup<br/>
+	Install mocha (npm install --global mocha) and chai (npm install chai).
 
 
 # Running Open IO
@@ -75,3 +80,4 @@ visit out [Learning Resources](https://github.com/gibboa/Open_IO/tree/master/Lea
 	4. In your web browser, visit "localhost:x" (x is the port number).
 	![url](images/url.png)
 	5. You should now see Open IO running.
+	6. Lastly, for unit testing, run the command "mocha" in the testing directory. 
