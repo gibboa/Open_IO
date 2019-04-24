@@ -49,7 +49,10 @@ function drawBG(pen){
 	}
 }
 
-
+//draw all foods on canvas
+//Args: food list, drawing context
+//Returns: noen
+//Modifies: canvas element
 function drawFood(foodList,pen){
 	let tile = new Image();
 	tile.src = "pictures/sprite_sheet.png";
@@ -65,6 +68,9 @@ function drawFood(foodList,pen){
 }
 
 //Draw the boost meter
+//Args: game obj, id of calling player so we can get their boost level
+//Returns: none
+//Modifies: canvas element
 function drawBoostMeter(g,id){
 	if(!g){return;}//game must be initialized
 	if(id == ""){return;}//dont bother if we havnt set id yet
@@ -83,8 +89,9 @@ function drawBoostMeter(g,id){
 //Draw the scoreboard
 //currently draws on a separate canvas with id="scoreboard"
 //later this will be drawn on the main canvas in the upper right corner
-//Args: SHOULD take players list, (later a context for main canvas)
-//ASSUMING use of global game object as of 4/13, indefinately...
+//Args: game obj
+//Returns: none
+//Modifies: scoreboard canvas element
 function drawScores(g){
 	let scoreboard_canvas = $("scoreboard");
 	let pen = scoreboard_canvas.getContext("2d");
@@ -93,28 +100,12 @@ function drawScores(g){
 	//pen.textAlighn = "center";
 	pen.fillText("Leaderboard", 45, 25);
 	if(!g){return;}//game must be initialized
-	//creating fake players object for testing////////////
-	players = {
-		id1: {name: "player1", score: 1223},
-		id2: {name: "player2", score: 111},
-		id3: {name: "player3", score: 1992},
-		id4: {name: "player5", score: 123},
-		id5: {name: "player6", score: 17773},
-		id6: {name: "player7", score: 1223},
-		id7: {name: "Scrooge McDuck", score: 19999},
-		id8: {name: "player9", score: 1},
-		id9: {name: "player10", score: 1233323},
-		id10: {name: "player11", score: 323},
-		id11: {name: "player4", score: 139999}
-	}
-	//////////////////////////////////////////////////////
 	//copying player object into array for array sort
 	let tmp_array = []
 	for(var key in g.players) {
 		if(g.players[key].alive){
   			tmp_array.push(g.players[key]);
-  		}//console.log(tmp_array); //use console.log and view with developer tools in browser for debugging
-  		//console.log(players[key]);
+  		}
   	}
   	//use array sort by player scores (high to low)
 	tmp_array.sort(function (a, b) {
@@ -139,7 +130,9 @@ function drawScores(g){
 }
 
 //Function to draw the snake
-//Arg: positions list from player.pos_list
+//Args: drawing context, player obj (snake to draw)
+//Returns: none
+//Modifies: canvas element
 function drawSnake(pen, player){
 	let tile = new Image();
 	tile.src = "pictures/sprite_sheet.png";
@@ -171,8 +164,9 @@ function drawSnake(pen, player){
 
 //Function to redraw entire canvas at end of update loop
 //It will clear the canvas and call all needed draw functions
-//Args: none
+//Args: drawing context, game obj, id of client 
 //Returns: none
+//Modifies: canvas elements
 function redrawCanvas(pen, game, id){
 	pen.clearRect(0, 0, 640, 640);//clear canvas
 	drawBG(pen);
@@ -187,7 +181,7 @@ function redrawCanvas(pen, game, id){
 	drawBoostMeter(game, id);
 }
 
-
+/////////////////////////////////Declaring Globals/////////////////////////////
 //creating global input queue
 //relevant array functionality:
 //unshift(): add to front (returns new length of array if you want)
@@ -198,23 +192,31 @@ var inputQueue = [];
 var player_ID = '';//stores ID of this player assigned by server
 
 var IDpassed = false;//has the player recieved its ID from the server yet?
+
+//////////////////////////////END Declaring Globals////////////////////////////
+
 //initGame()
 //This function is called when the player clicks the Play button...
 //It should begin the game for them changing the display and requesting
 //that the server add them to the game
+//main execution of game results from functions called within initGame
+//Args: none (globals)
+//Returns: none
+//Modifies: canvas element, game obj
 function initGame(){
 
 	//var game;
-	//maybe dont need this but w/e
+	//need later for client prediction
 	//var game = {
 	   // players: {},
 	    //foods: [],
 	    //board: {x: 640, y: 640}
 	    //name2id: {}
 	//};
+
 	//because this element is a text field, .value will store the users input in our variable
     var name= $('player_name').value;
-    //alert('hi ' + name + ' the game would be starting now if it existed');
+    
     $('game_barrier').style.display = "none";//turns off cover that was positioned over the canvas
     //gameboard contains the <canvas> element above
 	gameboard = $('canvas');
@@ -227,7 +229,6 @@ function initGame(){
 	//Establishing Connection to Game Server
 	var socket = io.connect(document.location.origin);
 	socket.on('connect', function(){
-		//alert("you are connected");
 		//send the name that the player typed in before starting
 		socket.emit('initPlayer',{
         	playerName: name
@@ -238,59 +239,20 @@ function initGame(){
 	socket.on('passID', function(data){
 		player_ID = data.name2id[name];
 		IDpassed = true;
-		//alert("you socket id on server is:" + player_ID);
 	});
 
-	/*THIS IS CLIENT PREDICTION LOOP (similar to update loop in function)
-	//trying out main update functions that mirrors the server one as anon in set interval
-	setInterval(function(inputQueue, game){
+	//GAME UPDATE LOOP WOULD GO HERE IF WE WERE USING CLIENT PREDICTION
 
-    //1. UPDATE PLAYER DIRECTIONS BASED ON INPUTS
-    //THINK OF A WAY TO INCORPORATE AUTHORITATIVE UPDATE
-    if(game){
-	    let i;
-	    let len = 0;
-	    if(inputQueue){
-	    	len = inputQueue.length;
-	    }
-	    for(i = 0; i < len; i++){
-	        let input = inputQueue.pop();//input is [socket.id, key_code]
-	        //process each input (only inputs are direction changes right now)
-	        game.players[input[0]].direction = keyToDir(input[1]);
-	    }
-    //2. UPDATE PLAYER LOCATIONS BASED ON DIRECTION
-
-    	moveSnakes(game);
-
-
-	    //3. UPDATE PLAYERS BASED ON GAME EVENTS (check various types of collisions)
-	    //change score, aliveness, length, food locations
-	    //4. REDRAW BOARD
-	    //gb = $('canvas');
-		//drawBuf is an object that will draw on our canvas
-		//ctx = gb.getContext('2d');
-	    redrawCanvas(ctx, game);
-	}
-	}, 1000/15);// call func every 15 ms
-	*/
-
-	//setInterval calls function fiven by first arg, every x milliseconds given by second arg
-	//so: call update() 30 times a second (basically determines framerate)
-	//setInterval(update, 10000);//to add args to function, pass them as args to setInterval after the time arg
-
-	//add event listener for player input
-	//pass it an inline anon function
+	//event listener for player input
+	//pass input an inline anon function
 	window.addEventListener('keydown', function(event) {
        	let key_code = event.keyCode;
-       	//alert("u pressed" + key_code);
         if (key_code == 16 || key_code == 32){//this is not written to handle client prediction yet
-        	//alert("EMITTING BOOS MSG");
             socket.emit('playerBoost',{
 	        	input: true //when key: SHIFT or SPACE is down, then toggle boost to true
         	});
         }else if(keyToDir(key_code) != ''){
-        	//alert("the key you just pressed is a valid movement");
-        	//inputQueue.unshift([player_ID, key_code])
+        	//send player inputs to server
             socket.emit('playerMovement',{
 	        	input: key_code
 	        	//NOTE when caught by listener on server key_code is accessed via arg.input
@@ -311,16 +273,14 @@ function initGame(){
 
 
 	//listens for gameStateUpdate message from server (just alerts for testing)
-	//(This works here, but doesn't work when called in update function)
-    socket.on('gameStateUpdate', function(data){
+    //socket.on('gameStateUpdate', function(data){
 		//alert('message: ' + data + ' received from server to update gamestate');
-	});
+	//});
 
+	//Authoritative Update recieved latest game state from server, and redraws game
 	socket.on('authoritativeUpdate', function(data){
-		//somehow update entire local gamestate with (data is the game obj here)
+		//update entire local gamestate with (data is the game obj here)
 		game = data;//probly need to do deep copy, doubt this works
-		//redrawCanvas(ctx, game, player_ID);//temporary while debugging
-		//TEMPORARILY REMOVING TO ISOLATE BUG
 		if(IDpassed){
 			if(player_ID in game.players){
 			redrawCanvas(ctx, game, player_ID);
@@ -340,8 +300,5 @@ function initGame(){
 			//player that hasnt recieved its ID yet
 			redrawCanvas(ctx, game, player_ID);
 		}
-		
-		
 	});
-
 }
