@@ -133,13 +133,33 @@ function checkGameEvents(p1, g){
 
     for (let id in g.players) {
     if(p1.playerId != g.players[id].playerId){
+      let adjust_score = true;
       if (checkCollision_Player(p1,g.players[id])){
+        //trying to recheck to see if it was head to head and then if it was head on
+        if (check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], g.players[id].pos_list[0][0], g.players[id].pos_list[0][1], 5,5)){
+          //yes head to head
+          console.log("head to head");
+          //check if it was head on, if so delete both
+          //if(p1.direction == "right" && g.players[id].direction == "left" ||
+           //p1.direction == "left" && g.players[id].direction == "right" ||
+          // p1.direction == "down" && g.players[id].direction == "up"  ||
+           //p1.direction == "up" && g.players[id].direction == "down"){
+            //console.log("head on collision");
+            convertFood(g.players[id],g);
+            adjust_score = false;
+            g.players[id].alive = false;
+            delete g.name2id[g.players[id].name];
+            delete g.players[g.players[id].playerId];
+            
+          //}
+        }
         //console.log("THERE WAS A COLLISION");
         p1.alive = false;
+        convertFood(p1,g);
         delete g.name2id[p1.name];
         delete g.players[p1.playerId];
-        g.players[id].score += 100;
-        convertFood(p1,g);
+        if(adjust_score){g.players[id].score += 50;}
+        
         return;
       }
     }
@@ -159,7 +179,7 @@ function checkGameEvents(p1, g){
       
       p1.pos_list.push([p1.path[p1.length*6][0], p1.path[p1.length*6][1]]);
       p1.length += 1;
-      if(g.foods.length < 10){
+      if(g.foods.length < 30){
         addFood(g);
       }
     }
@@ -236,7 +256,7 @@ function addFood(g){
     if(currFoodValid){
       g.foods.push({x:fx, y:fy});
     }
-    if(g.foods.length >= 10){
+    if(g.foods.length >= 30){
       locationsNotValidated = false;
     }
   }
@@ -263,7 +283,7 @@ function initFoods(g){
     if(currFoodValid){
       arr.push({x:fx, y:fy});
     }
-    if(arr.length >= 10){
+    if(arr.length >= 30){
       locationsNotValidated = false;
     }
   }
@@ -309,7 +329,7 @@ function initSnakeLocations(/*arr,*/ length, direction, g){
         for(i=0; i<length; i++){//for each coord in tmp_arr
           for(let k in g.players){
             for(let j=0; j<g.players[k].pos_list.length; j++){//for each coord in each existing player
-              if(check_overlap(g.players[k].pos_list[j][0], g.players[k].pos_list[j][1], tmp_arr[i][0], tmp_arr[i][1], 17,17)){
+              if(check_overlap(g.players[k].pos_list[j][0], g.players[k].pos_list[j][1], tmp_arr[i][0], tmp_arr[i][1], 50,50)){//17,17
                 validated = false;
                 break;
               }
