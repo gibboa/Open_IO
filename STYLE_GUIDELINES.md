@@ -2,7 +2,7 @@
 Open IO style guidelines are the perfect marriage between legible usefulness and flexibility. We ask contributors to follow the style guidelines below.
 
 ### Brackets
-Open IO uses Stroustrup style, a variant of K&R, in which K&R extends to fuctions and classes, not just the blocks inside the function. All these brackets have their opening braces on the same line as their respective control statements; closing braces remain in a line of their own, unless followed by a keyword, such as else or while.
+Open IO uses Stroustrup style, a variant of K&R, in which K&R extends to functions and classes, not just the blocks inside the function. All these brackets have their opening braces on the same line as their respective control statements; closing braces remain in a line of their own, unless followed by a keyword, such as else or while.
 ```
 function partyAtHq(open_io_downloads) {
    if (open_io_downloads >= 1000000) {
