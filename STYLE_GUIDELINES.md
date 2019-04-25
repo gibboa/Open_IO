@@ -18,7 +18,7 @@ openSnakeGameFunction()
 ```
 
 ### File Names
-Files that must be easy to find when visiting a repository must be entirely capitalized, in which multiple words are separated by underscores. These files apply to anything that a new user must immediately see once coming accross this repository for the first time, such as the README, LICENSE, CODE_OF_CONDUCT, and of course, this file, STYLE_GUIDELINES. These files must be located in the home (highest) directory of the repository. README.md is an exception, in which separate words should not be underscored.
+Files that must be easy to find when visiting a repository must be entirely capitalized, in which multiple words are separated by underscores. These files apply to anything that a new user must immediately see once coming across this repository for the first time, such as the README, LICENSE, CODE_OF_CONDUCT, and of course, this file, STYLE_GUIDELINES. These files must be located in the home (highest) directory of the repository. README.md is an exception, in which separate words should not be underscored.
 ```
 STYLE_GUIDELINES.md
 ```
