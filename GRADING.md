@@ -90,7 +90,7 @@ Did you need to learn new technologies? Did you document your learning path in a
 
 Are you participating in community activities such as code reviews and the discussion forum?  
 - Participated in the [Matermost Channel](https://chat.rcos.io/open-source/channels/openio)
-- Participated in weekly meetings (Wednesdays) and optional meetings (Saturdays), in which we had Scrum, code reviews, and planned our project.
+- Participated in weekly meetings (Wednesdays) and optional meetings (Saturdays), in which we had Scrum, code reviews, and planned our project
 - Participated in [Open IO RCOS Blog](https://rcos.io/projects/gibboa/open_io/blog)
 
 ### David Roche 
