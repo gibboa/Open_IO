@@ -24,24 +24,71 @@ function check_overlap(x1, y1, x2, y2, rad1, rad2){
 
 
 function checkCollision_Board(p1,g) {
-  if (p1.pos_list[0][0]+5 >= g.board.x || p1.pos_list[0][1]+5 >= g.board.y) {return true;}
-  else if (p1.pos_list[0][0]-5 <= 0 || p1.pos_list[0][0]-5 <= 0) {return true;}
-  return false;
+  if (p1.alive){
+    if (p1.pos_list[0][0]+5 >= g.board.x || p1.pos_list[0][1]+5 >= g.board.y) {return true;}
+    else if (p1.pos_list[0][0]-5 <= 0 || p1.pos_list[0][1]-5 <= 0) {return true;}
+    return false;
+  }
 }
 
-
 function checkCollision_Player(p1, p2) {
-  for (var i = 0; i < p2.pos_list.length; i++) {
-    if (check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], p2.pos_list[i][0], p2.pos_list[i][1], 5,5) == true){
-      return true;
+  if (p1.alive) {
+    // first check it was the heads of the snakes that collided
+    // necessary to check separately because orientation matters here
+    //if (check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], p2.pos_list[0][0], p2.pos_list[0][1], 5,5)) {
+    //    if(p1.pos_list[0][0] < p2.pos_list[0][0] && p1.direction == "right" && p2.direction == "left" ||
+    //       p1.pos_list[0][0] > p2.pos_list[0][0] && p1.direction == "left" && p2.direction == "right" ||
+    //       p1.pos_list[0][1] < p2.pos_list[0][1] && p1.direction == "down" && p1.direction == "up" ||
+    //       p1.pos_list[0][1] > p2.pos_list[0][1] && p1.direction == "up" && p1.direction == "down")
+    //    {
+    //      return true;
+    //  }
+    //}
+    
+    if(p2.alive) {
+      // if player 2 is still alive, all that matters is if we hit them, so check that the relative
+      // coordinates and orientations line up
+      if (check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], p2.pos_list[0][0], p2.pos_list[0][1], 5,5)) {
+        if(p1.pos_list[0][0] < p2.pos_list[0][0] && p1.direction == "right" ||
+           p1.pos_list[0][0] > p2.pos_list[0][0] && p1.direction == "left" ||
+           p1.pos_list[0][1] < p2.pos_list[0][1] && p1.direction == "down" ||
+           p1.pos_list[0][1] > p2.pos_list[0][1] && p1.direction == "up")
+        {
+          return true;
+        }
+      }
+    } else {
+      // if the other player *isn't* alive, we only die if the collision was head-on
+      // therefore we add an extra element to the conditional to check that that's what happened
+      if (check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], p2.pos_list[0][0], p2.pos_list[0][1], 5,5)) {
+        if(p1.pos_list[0][0] < p2.pos_list[0][0] && p1.direction == "right" && p2.direction == "left" ||
+           p1.pos_list[0][0] > p2.pos_list[0][0] && p1.direction == "left" && p2.direction == "right" ||
+           p1.pos_list[0][1] < p2.pos_list[0][1] && p1.direction == "down" && p2.direction == "up"  ||
+           p1.pos_list[0][1] > p2.pos_list[0][1] && p1.direction == "up" && p2.direction == "down")
+        {
+          return true;
+        }
+      }
     }
+    
+    
+    // check the rest of the body for collisions
+    for (var i = 1; i < p2.pos_list.length; i++) {
+        //console.log("i: " + i);
+      if (check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], p2.pos_list[i][0], p2.pos_list[i][1], 5,5) == true) {
+        return true;
+      }
+    }
+    
   }
   return false;
 }
 
 
 function checkCollision_Food(p1, foods) {
-  return check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], foods.x, foods.y, 5,5);
+  if (p1.alive){
+    return check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], foods.x, foods.y, 5,5);
+  }
 }
 
 
@@ -113,19 +160,23 @@ function initFoods(g){
 
 var pa = {
 	name: "p1",
-	pos_list: initSnakeLocations(4, 'up')
+	pos_list: initSnakeLocations(4, 'up'),
+	alive: true
 }
 var pb = {
 	name: "p2",
-	pos_list: initSnakeLocations(0, 'left')
+	pos_list: initSnakeLocations(0, 'left'),
+	alive: true
 }
 var pc = {
 	name: "p3",
-	pos_list: initSnakeLocations(11, 'down')
+	pos_list: initSnakeLocations(11, 'down'),
+	alive: true
 }
 var pd = {
 	name: "p4",
-	pos_list: initSnakeLocations(100, 'right')
+	pos_list: initSnakeLocations(100, 'right'),
+	alive: true
 }
 pd.pos_list[0][0] += 900;
 var game = {
