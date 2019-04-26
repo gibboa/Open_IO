@@ -45,3 +45,28 @@ Did you need to learn new technologies? Did you document your learning path in a
 
 Are you participating in community activities such as code reviews and the discussion forum?  
 - Participated in the Mattermost Channel
+
+### Adam Gibbons
+
+What have you contributed back to the OS Community?  
+- Benevolent Dictator of project, in charge of pull requests to blessed repository
+- Created Learning Resources README guide and posted completed tutorial code examples to run
+- Contributed to technology research and game design in early phase of project
+- Graphic design for game, project logo
+- Code writing
+
+How big is your codebase/where is it located
+- Most code is in [repository](https://github.com/gibboa/Open_IO)
+- specifically server.js, proto_frontend_scripts.js: I contributed to all functions in some way (testing, reviewing, or writing) and wrote several of the initialization functions, draw functions, the game loop, input listeners, and server/client communication functions.
+- wrote proto_index.html, proto_style.css
+
+Did you need to learn new technologies? Did you document your learning path in a tutorial?  
+- practiced javascript, html, css
+- learned node.js, socket.io, express, and multiplayer game design 
+- Documentation found in [learning resources](https://github.com/gibboa/Open_IO/tree/master/LearningResources)
+
+Are you participating in community activities such as code reviews and the discussion forum?  
+- Participated in Mattermost, bi-weekly meetings, blog posts, pull requests/reviews, play testing, bug fixing, code writing
+
+
+
