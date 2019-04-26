@@ -13,9 +13,9 @@ var io = require('socket.io').listen(server);
 //Invariant: box length = 2*rad + 1
 //Returns: true if the boxes overlap, else false
 //Modifies: none
-function check_overlap(x1, y1, x2, y2, rad1, rad2){
+function check_overlap(x1, y1, x2, y2, rad1, rad2) {
   if ( (x1+rad1 >= x2-rad2 && x1+rad1 <= x2+rad2) || (x1-rad1 <= x2+rad2 && x1+rad1 >= x2-rad2) ) {
-    if ( (y1+rad1 >= y2-rad2 && y1+rad1 <= y2+rad2) || (y1-rad1 <= y2+rad2 && y1-rad1 >= y2-rad2) ){
+    if ( (y1+rad1 >= y2-rad2 && y1+rad1 <= y2+rad2) || (y1-rad1 <= y2+rad2 && y1-rad1 >= y2-rad2) ) {
       return true;
     }
   }
@@ -27,9 +27,13 @@ function check_overlap(x1, y1, x2, y2, rad1, rad2){
 //Returns: true if p1 collides with edge of board, else false
 //Modifies: none
 function checkCollision_Board(p1,g) {
-  if (p1.alive){
-    if (p1.pos_list[0][0]+5 >= g.board.x || p1.pos_list[0][1]+5 >= g.board.y) {return true;}
-    else if (p1.pos_list[0][0]-5 <= 0 || p1.pos_list[0][1]-5 <= 0) {return true;}
+  if (p1.alive) {
+    if (p1.pos_list[0][0]+5 >= g.board.x || p1.pos_list[0][1]+5 >= g.board.y) {
+      return true;
+    }
+    else if (p1.pos_list[0][0]-5 <= 0 || p1.pos_list[0][1]-5 <= 0) {
+      return true;
+    }
     return false;
   }
 }
@@ -92,16 +96,16 @@ function checkCollision_Food(p1, foods) {
 //Args: dead player object, game obj
 //Returns: none
 //Modifies: game obj
-function convertFood(p1, g){
+function convertFood(p1, g) {
   for (var i = 1; i < p1.length; i+=2) {
     let food_temp = { x:p1.pos_list[i][0], y:p1.pos_list[i][1] };
     let locationsNotValidated = true;
-    while(locationsNotValidated){
+    while(locationsNotValidated) {
       let fx = food_temp.x;
       let fy = food_temp.y;
       let currFoodValid = true
-      for(let i=0; i<g.foods.length; i++){
-        if(check_overlap(fx, fy, g.foods[i].x, g.foods[i].y, 5,5)){//could be 5,5
+      for(let i=0; i<g.foods.length; i++) {
+        if(check_overlap(fx, fy, g.foods[i].x, g.foods[i].y, 5,5)) {//could be 5,5
           currFoodValid = false;
         }
       }
@@ -113,10 +117,10 @@ function convertFood(p1, g){
           }
         }
       }*/
-      if(currFoodValid){
+      if(currFoodValid) {
         g.foods.push({x:fx, y:fy});
       }
-      if(g.foods.length >= 10){
+      if(g.foods.length >= 10) {
         locationsNotValidated = false;
       }
     }//END WHILE
@@ -128,7 +132,7 @@ function convertFood(p1, g){
 //Args: player obj to check events for, game obj
 //Returns: none
 //Modifies: player,  game
-function checkGameEvents(p1, g){
+function checkGameEvents(p1, g) {
   if (checkCollision_Board(p1, g)) {
     p1.alive = false;
     delete g.name2id[p1.name];
@@ -138,11 +142,11 @@ function checkGameEvents(p1, g){
   }
 
     for (let id in g.players) {
-    if(p1.playerId != g.players[id].playerId){
+    if(p1.playerId != g.players[id].playerId) {
       let adjust_score = true;
-      if (checkCollision_Player(p1,g.players[id])){
+      if (checkCollision_Player(p1,g.players[id])) {
         //trying to recheck to see if it was head to head and then if it was head on
-        if (check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], g.players[id].pos_list[0][0], g.players[id].pos_list[0][1], 5,5)){
+        if (check_overlap(p1.pos_list[0][0], p1.pos_list[0][1], g.players[id].pos_list[0][0], g.players[id].pos_list[0][1], 5,5)) {
           //yes head to head
           console.log("head to head");
           //check if it was head on, if so delete both
@@ -156,7 +160,9 @@ function checkGameEvents(p1, g){
         convertFood(p1,g);
         delete g.name2id[p1.name];
         delete g.players[p1.playerId];
-        if(adjust_score){g.players[id].score += 50;}
+        if(adjust_score) {
+          g.players[id].score += 50;
+        }
         
         return;
       }
@@ -166,7 +172,7 @@ function checkGameEvents(p1, g){
   //check for collisions with each food on board 
   //if so: delete eaten food, grow snake, add replacement food 
   for (var i = 0; i < g.foods.length; i++) {
-    if (checkCollision_Food(p1, g.foods[i])){
+    if (checkCollision_Food(p1, g.foods[i])) {
       p1.score += 10;
       g.foods.splice(i, 1);
       p1.path_len += 12;//changed from 6 to mitigate overeating bug...
@@ -174,7 +180,7 @@ function checkGameEvents(p1, g){
       p1.pos_list.push([p1.path[p1.length*6][0], p1.path[p1.length*6][1]]);
       p1.length += 1;
 
-      if(g.foods.length < 30){
+      if(g.foods.length < 30) {
         addFood(g);
       }
     }
@@ -187,7 +193,7 @@ function checkGameEvents(p1, g){
 //Returns: string containing relevant direction
 //if key is not a,w,s,d,up,down,left,right string will be empty
 //Modifies: none
-function keyToDir(keyCode){
+function keyToDir(keyCode) {
 //keyCode Reference for likely keys:
 //'w'=87, 'a'=65, 's'=83, 'd'=68, SHIFT=16, SPACE=32, 'e'=69, 'q'=81
 //UP=38, DOWN=40, LEFT=37, RIGHT=39, ENTER=13
@@ -208,7 +214,7 @@ function keyToDir(keyCode){
 //Args: none
 //Returns: string: 'up', 'down', 'left', 'right'
 //Modifies: none
-function initSnakeDirection(){
+function initSnakeDirection() {
   let randNum = Math.floor(Math.random() * Math.floor(4));//returns 0,1,2, or 3
   let dir = '';
   switch (randNum) {
@@ -224,7 +230,7 @@ function initSnakeDirection(){
 //Returns: an int 1,2,...10 since there are 10 skins right now
 //Args: none
 //Modifies: none
-function initColor(){
+function initColor() {
   return Math.floor(Math.random() * Math.floor(10)) + 1
 }
 
@@ -233,20 +239,20 @@ function initColor(){
 //Args: game object
 //Returns: none
 //Modifies: food list of game object
-function addFood(g){
+function addFood(g) {
   let locationsNotValidated = true;
-  while(locationsNotValidated){
+  while(locationsNotValidated) {
     let fx = Math.floor(Math.random() * 628) + 6; //current board is 640px X 640px so
     let fy = Math.floor(Math.random() * 628) + 6; //place player randomly between 160px-480px
     let currFoodValid = true
-    for(let i=0; i<g.foods.length; i++){
-      if(check_overlap(fx, fy, g.foods[i].x, g.foods[i].y, 6,6)){//could be 5,5
+    for(let i=0; i<g.foods.length; i++) {
+      if(check_overlap(fx, fy, g.foods[i].x, g.foods[i].y, 6,6)) {//could be 5,5
         currFoodValid = false;
       }
     }
-    for(let k in g.players){
-      for(let i=0; i<g.players[k].pos_list.length; i++){
-        if(check_overlap(fx, fy, g.players[k].pos_list[i].x, g.players[k].pos_list[i].y, 6,6)){
+    for(let k in g.players) {
+      for(let i=0; i<g.players[k].pos_list.length; i++) {
+        if(check_overlap(fx, fy, g.players[k].pos_list[i].x, g.players[k].pos_list[i].y, 6,6)) {
           currFoodValid = false;
         }
       }
@@ -254,7 +260,7 @@ function addFood(g){
     if(currFoodValid){
       g.foods.push({x:fx, y:fy});
     }
-    if(g.foods.length >= 30){
+    if(g.foods.length >= 30) {
       locationsNotValidated = false;
     }
   }
@@ -266,22 +272,22 @@ function addFood(g){
 //Args: (game) but going global to be safe
 //Returns:
 //Modifies: game.foods
-function initFoods(g){
+function initFoods(g) {
   var arr = [];
   let locationsNotValidated = true;
-  while(locationsNotValidated){
+  while(locationsNotValidated) {
     let fx = Math.floor(Math.random() * 628) + 6; //current board is 640px X 640px so
     let fy = Math.floor(Math.random() * 628) + 6; //place player randomly between 160px-480px
     let currFoodValid = true
-    for(let i=0; i<arr.length; i++){
-      if(check_overlap(fx, fy, arr[i].x, arr[i].y, 6)){
+    for(let i=0; i<arr.length; i++) {
+      if(check_overlap(fx, fy, arr[i].x, arr[i].y, 6)) {
         currFoodValid = false;
       }
     }
-    if(currFoodValid){
+    if(currFoodValid) {
       arr.push({x:fx, y:fy});
     }
-    if(arr.length >= 30){
+    if(arr.length >= 30) {
       locationsNotValidated = false;
     }
   }
@@ -299,7 +305,7 @@ function initFoods(g){
 //playersObj may need to be whole game object (this function needs to
 // call the collision detection functions, so it requires the same things)
 //Requires: length is set, directions is set, arr is empty
-function initSnakeLocations(/*arr,*/ length, direction, g){
+function initSnakeLocations(/*arr,*/ length, direction, g) {
   var arr = [];
   let locationsNotValidated = true;
   while(locationsNotValidated){
@@ -309,7 +315,7 @@ function initSnakeLocations(/*arr,*/ length, direction, g){
     let tmp_arr = [];
     tmp_arr.push([x,y]);
     let i;
-    for(i=1; i<length; i++){
+    for(i=1; i<length; i++) {
       //generating points points based on direction, points are 5 px apart
       let offset = i*6;
       switch (direction) {
@@ -321,20 +327,26 @@ function initSnakeLocations(/*arr,*/ length, direction, g){
     }
     //call collision detection on each location
     let validated = true;
-    if(g){//if game is intialized
-      if(g.players.length > 1){//if its not the first player
-        for(i=0; i<length; i++){//for each coord in tmp_arr
-          for(let k in g.players){
-            for(let j=0; j<g.players[k].pos_list.length; j++){//for each coord in each existing player
-              if(check_overlap(g.players[k].pos_list[j][0], g.players[k].pos_list[j][1], tmp_arr[i][0], tmp_arr[i][1], 50,50)){//17,17
+    if(g) {//if game is intialized
+      if(g.players.length > 1) {//if its not the first player
+        for(i=0; i<length; i++) {//for each coord in tmp_arr
+          for(let k in g.players) {
+            for(let j=0; j<g.players[k].pos_list.length; j++) {//for each coord in each existing player
+              if(check_overlap(g.players[k].pos_list[j][0], g.players[k].pos_list[j][1], tmp_arr[i][0], tmp_arr[i][1], 50,50)) {//17,17
                 validated = false;
                 break;
               }
-              if(!validated){break;}
+              if(!validated) {
+                break;
+              }
             }
-            if(!validated){break;}
+            if(!validated){ 
+              break;
+            }
           }
-          if(!validated){break;}
+          if(!validated) {
+            break;
+          }
         }
       }
     }
@@ -353,7 +365,7 @@ function initSnakeLocations(/*arr,*/ length, direction, g){
 //Args: snake length, direction, pos_list of snake
 //Returns: array of coords (a path the snake as traveled and which
 //body segments must travel to follow the head)changed direction to
-function initPath(length, dir, arr){
+function initPath(length, dir, arr) {
   var tmp_path = [];
   let i;
   let px_len = (length * 6) + 12; 
@@ -361,7 +373,7 @@ function initPath(length, dir, arr){
   let x = arr[0][0];
   let y = arr[0][1];
   tmp_path.push([x,y]);
-  for(i=1; i<px_len; i++){
+  for(i=1; i<px_len; i++) {
     //generating points points based on direction, points are 1 px apart
     switch (dir) {
       case 'up':
@@ -389,19 +401,24 @@ function initPath(length, dir, arr){
 //Args: reference to game object
 //Returns: none, changes made to referenced object
 //Requires: game is initialized
-function moveSnakes(){
+function moveSnakes() {
     //arbitraily going to move the snake 1px...no clue how this will go
     for(var key in game.players) {
-        if(!game.players[key].alive){continue;}
+        if(!game.players[key].alive) {
+          continue;
+        }
         let change_x = 0, change_y = 0;
         cur_dir = game.players[key].direction
-        if(cur_dir == 'up'){//up
+        if(cur_dir == 'up') {//up
             change_y = -1 * game.players[key].velocity;
-        }else if(cur_dir == 'right'){//right
+        }
+        else if(cur_dir == 'right') {//right
             change_x = 1 * game.players[key].velocity;
-        }else if(cur_dir == 'down'){//down
+        }
+        else if(cur_dir == 'down') {//down
             change_y = 1 * game.players[key].velocity;
-        }else{//left
+        }
+        else {//left
             change_x = -1 * game.players[key].velocity;
         }
         
@@ -410,31 +427,31 @@ function moveSnakes(){
         game.players[key].pos_list[0][1] += change_y;
 
         //push new loc to front of path queue and all points in between in velocity
-        if(cur_dir == 'up'){//up
-          for(let i = game.players[key].velocity - 1; i >= 0; i--){
+        if(cur_dir == 'up') {//up
+          for(let i = game.players[key].velocity - 1; i >= 0; i--) {
             game.players[key].path.unshift([game.players[key].pos_list[0][0],game.players[key].pos_list[0][1]+i]);
           }
-        }else if(cur_dir == 'right'){//right
-          for(let i = game.players[key].velocity - 1; i >= 0; i--){
+        }else if(cur_dir == 'right') {//right
+          for(let i = game.players[key].velocity - 1; i >= 0; i--) {
             game.players[key].path.unshift([game.players[key].pos_list[0][0]-i,game.players[key].pos_list[0][1]]);
           }
-        }else if(cur_dir == 'down'){//down
-          for(let i = game.players[key].velocity - 1; i >= 0; i--){
+        }else if(cur_dir == 'down') {//down
+          for(let i = game.players[key].velocity - 1; i >= 0; i--) {
             game.players[key].path.unshift([game.players[key].pos_list[0][0],game.players[key].pos_list[0][1]-i]);
           }
-        }else{//left
-          for(let i = game.players[key].velocity - 1; i >= 0; i--){
+        }else {//left
+          for(let i = game.players[key].velocity - 1; i >= 0; i--) {
             game.players[key].path.unshift([game.players[key].pos_list[0][0]+i,game.players[key].pos_list[0][1]]);
           }
         }
 
         //loop through segment coords and get new coord off path
-        for(let i=1; i < game.players[key].length; i++){
+        for(let i=1; i < game.players[key].length; i++) {
             game.players[key].pos_list[i][0] = game.players[key].path[i*6][0];
             game.players[key].pos_list[i][1] = game.players[key].path[i*6][1];
         }
 
-        while(game.players[key].path.length > game.players[key].path_len){//was if
+        while(game.players[key].path.length > game.players[key].path_len) {//was if
           //we dont need to store extra coords until another segment is add
           //which means we have enough room to add a segment if needed
           game.players[key].path.pop();//so pop last value
@@ -446,25 +463,27 @@ function moveSnakes(){
 //Args: none (accesses global game obj)
 //Returns: none
 //Modifies: game obj
-function updateBoosts(){
+function updateBoosts() {
   for(var key in game.players) {
-    if(game.players[key].boosting){
+    if(game.players[key].boosting) {
       //decrease boost meter
       game.players[key].boost_level -= 1;//WAS 0.25 but testing with 1
-    }else{
+    }
+    else {
       //increase boos meter
       game.players[key].boost_level += 0.5;
     }
-    if(game.players[key].boost_level > game.players[key].boost_cap){
+    if(game.players[key].boost_level > game.players[key].boost_cap) {
       game.players[key].boost_level = game.players[key].boost_cap;
     }
-    if(game.players[key].boost_level < 0){
+    if(game.players[key].boost_level < 0) {
       game.players[key].boost_level = 0;
     }
     //adjust velocity based on input and boost meter
-    if(game.players[key].boosting && game.players[key].boost_level > 0){
+    if(game.players[key].boosting && game.players[key].boost_level > 0) {
       game.players[key].velocity = 5;
-    }else{
+    }
+    else {
       game.players[key].velocity = 2;
     }
   }
@@ -511,27 +530,28 @@ var update_count = 0; //global var to trigger authoritative updates
 //runs every 15 ms
 //Modifies: game
 //"authoritativeUpdate" emit located here
-setInterval(function(){
-    if(game){
+setInterval(function() {
+    if(game) {
          //1. UPDATE PLAYER DIRECTIONS BASED ON INPUTS
         let i;
         let len = 0;
-        if(game.players){
+        if(game.players) {
             len = inputQueue.length;
         }
-        for(i = 0; i < len; i++){
+        for(i = 0; i < len; i++) {
             let input = inputQueue.pop();//input is [socket.id, key_code]
             //process each input
             //if input toggles boost:
-            if (input[1] == true || input[1] == false){
+            if (input[1] == true || input[1] == false) {
               if(input[0] in game.players){
                 if(game.players[input[0]].alive){
                   game.players[input[0]].boosting = input[1];
                 }
               }
-            }else{//input changes direction
-              if(input[0] in game.players){
-                if(game.players[input[0]].alive){
+            }
+            else {//input changes direction
+              if(input[0] in game.players) {
+                if(game.players[input[0]].alive) {
                   game.players[input[0]].direction = keyToDir(input[1]);
                 }
               }
@@ -546,7 +566,7 @@ setInterval(function(){
 
         //3. UPDATE PLAYERS BASED ON GAME EVENTS (check various types of collisions)
         //change score, aliveness, length, food locations
-        for(let id in game.players){
+        for(let id in game.players) {
           checkGameEvents(game.players[id], game);
         }
 
@@ -604,7 +624,7 @@ io.on('connection', function (socket) {
       boosting: false
   	};
 
-  	socket.on('initPlayer', function(data){//initPlayer emitted after player recieves CONNACK
+  	socket.on('initPlayer', function(data) {//initPlayer emitted after player recieves CONNACK
   		//change name in player object
   		game.players[socket.id].name = data.playerName;//data.playerName is incoming info from client
       game.name2id[data.playerName] = socket.id;
@@ -620,14 +640,14 @@ io.on('connection', function (socket) {
   	});
 
   	//when the client emits a 'playerMovement' msg we catch the data here
-  	socket.on('playerMovement', function(data){
+  	socket.on('playerMovement', function(data) {
   		//add client keyboard inputs to the input queue to be dealt with during update function
-      if(game.players[socket.id]){
+      if(game.players[socket.id]) {
         inputQueue.unshift([socket.id, data.input]);//data.input is a number (key code)
       }
   	});
 
-    socket.on('playerBoost', function(data){
+    socket.on('playerBoost', function(data) {
       inputQueue.unshift([socket.id, data.input]);//data.input is bool, true/false
     });
 

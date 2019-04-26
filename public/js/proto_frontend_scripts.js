@@ -7,13 +7,15 @@
 //document.getElementById() which gives access to HTML elements
 //based on the ID passed into (which is set in the HTML) via
 //the DOM....when you see $, realize that its calling this function
-function $(id){return document.getElementById(id);}
+function $(id) {
+	return document.getElementById(id);
+}
 
 //Function to convert key codes to direction strings
 //Args: int keyCode
 //Returns: string containing relevant direction
 //if key is not a,w,s,d,up,down,left,right string will be empty
-function keyToDir(keyCode){
+function keyToDir(keyCode) {
 //keyCode Reference for likely keys:
 //'w'=87, 'a'=65, 's'=83, 'd'=68, SHIFT=16, SPACE=32, 'e'=69, 'q'=81
 //UP=38, DOWN=40, LEFT=37, RIGHT=39, ENTER=13
@@ -32,13 +34,13 @@ function keyToDir(keyCode){
 
 //Draw background of canvas using a tile from the style sheet
 //Args: pen, a context from the canvas object
-function drawBG(pen){
+function drawBG(pen) {
 	let tile = new Image();
 	tile.src = "pictures/sprite_sheet.png";
 	let tileLen = 10; //tile is a 10x10 square
 	let x = 0, y = 0;
-	for(x=0; x<64; x+=1){
-		for(y=0; y<64; y +=1){
+	for(x=0; x<64; x+=1) {
+		for(y=0; y<64; y +=1) {
 			//to use drawImage() with sprite sheet, it takes 9 args:
 			//1. imgName, 2. x of sprite cutout 3. y of sprite cutout 4. width of sprite cutout
 			//5. height of sprite cutout 6. x of canvas location 7. y of canvas location
@@ -53,11 +55,11 @@ function drawBG(pen){
 //Args: food list, drawing context
 //Returns: noen
 //Modifies: canvas element
-function drawFood(foodList,pen){
+function drawFood(foodList,pen) {
 	let tile = new Image();
 	tile.src = "pictures/sprite_sheet.png";
 	let tileLen = 11; //tile is a 11x11 square
-	for(i=0; i<foodList.length; i+=1){
+	for(i=0; i<foodList.length; i+=1) {
 		//to use drawFood() with sprite sheet, it takes 9 args:
 		//1. imgName, 2. x of sprite cutout 3. y of sprite cutout 4. width of sprite cutout
 		//5. height of sprite cutout 6. x of canvas location 7. y of canvas location
@@ -71,9 +73,13 @@ function drawFood(foodList,pen){
 //Args: game obj, id of calling player so we can get their boost level
 //Returns: none
 //Modifies: canvas element
-function drawBoostMeter(g,id){
-	if(!g){return;}//game must be initialized
-	if(id == ""){return;}//dont bother if we havnt set id yet
+function drawBoostMeter(g,id) {
+	if(!g){
+		return;
+	}//game must be initialized
+	if(id == "") {
+		return;
+	}//dont bother if we havnt set id yet
 	//drawing boost meter on same canvas as scoreboard
 	let scoreboard_canvas = $("scoreboard");
 	let pen = scoreboard_canvas.getContext("2d");
@@ -92,18 +98,20 @@ function drawBoostMeter(g,id){
 //Args: game obj
 //Returns: none
 //Modifies: scoreboard canvas element
-function drawScores(g){
+function drawScores(g) {
 	let scoreboard_canvas = $("scoreboard");
 	let pen = scoreboard_canvas.getContext("2d");
 	pen.font = "20px Arial";
 	pen.fillStyle = "red";
 	//pen.textAlighn = "center";
 	pen.fillText("Leaderboard", 45, 25);
-	if(!g){return;}//game must be initialized
+	if(!g) {
+		return;
+	}//game must be initialized
 	//copying player object into array for array sort
 	let tmp_array = []
 	for(var key in g.players) {
-		if(g.players[key].alive){
+		if(g.players[key].alive) {
   			tmp_array.push(g.players[key]);
   		}
   	}
@@ -114,8 +122,10 @@ function drawScores(g){
 	//draw scores from sorted array
 	let y_offset = 50;
 	let count = 1;
-	for(var i in tmp_array){
-		if(count>10){break;}
+	for(var i in tmp_array) {
+		if(count>10) {
+			break;
+		}
 		pen.font = "12px Arial";
 		pen.fillStyle = "red";
 		//pen.textAlign = "center";
@@ -133,18 +143,18 @@ function drawScores(g){
 //Args: drawing context, player obj (snake to draw)
 //Returns: none
 //Modifies: canvas element
-function drawSnake(pen, player){
+function drawSnake(pen, player) {
 	let tile = new Image();
 	tile.src = "pictures/sprite_sheet.png";
 	let offset = player.color*10;
 
 	//draw back to front
-	if(player.alive){
-		for(let i=player.pos_list.length-1; i>=1; i--){
+	if(player.alive) {
+		for(let i=player.pos_list.length-1; i>=1; i--) {
 			pen.drawImage(tile, 40, offset, 10, 10, player.pos_list[i][0] - 5, player.pos_list[i][1] - 5, 11, 11);
 		}
 
-		switch (player.direction){
+		switch (player.direction) {
 			case 'up':
 				pen.drawImage(tile, 0, offset, 10, 10, player.pos_list[0][0] - 5, player.pos_list[0][1] - 5, 11, 11);
 				break;
@@ -167,10 +177,10 @@ function drawSnake(pen, player){
 //Args: drawing context, game obj, id of client 
 //Returns: none
 //Modifies: canvas elements
-function redrawCanvas(pen, game, id){
+function redrawCanvas(pen, game, id) {
 	pen.clearRect(0, 0, 640, 640);//clear canvas
 	drawBG(pen);
-	for(var key in game.players){
+	for(var key in game.players) {
 		drawSnake(pen, game.players[key]);
 	}
 	drawFood(game.foods, pen);
@@ -203,7 +213,7 @@ var IDpassed = false;//has the player recieved its ID from the server yet?
 //Args: none (globals)
 //Returns: none
 //Modifies: canvas element, game obj
-function initGame(){
+function initGame() {
 
 	//var game;
 	//need later for client prediction
@@ -228,7 +238,7 @@ function initGame(){
 	
 	//Establishing Connection to Game Server
 	var socket = io.connect(document.location.origin);
-	socket.on('connect', function(){
+	socket.on('connect', function() {
 		//send the name that the player typed in before starting
 		socket.emit('initPlayer',{
         	playerName: name
@@ -247,11 +257,12 @@ function initGame(){
 	//pass input an inline anon function
 	window.addEventListener('keydown', function(event) {
        	let key_code = event.keyCode;
-        if (key_code == 16 || key_code == 32){//this is not written to handle client prediction yet
+        if (key_code == 16 || key_code == 32) {//this is not written to handle client prediction yet
             socket.emit('playerBoost',{
 	        	input: true //when key: SHIFT or SPACE is down, then toggle boost to true
         	});
-        }else if(keyToDir(key_code) != ''){
+        }
+        else if(keyToDir(key_code) != '') {
         	//send player inputs to server
             socket.emit('playerMovement',{
 	        	input: key_code
@@ -264,7 +275,7 @@ function initGame(){
 	//listen for keyup of shift or spacebar to end boost
 	window.addEventListener('keyup', function(event) {
 		let key_code = event.keyCode;
-		if (key_code == 16 || key_code == 32){
+		if (key_code == 16 || key_code == 32) {
             socket.emit('playerBoost',{
 	        	input: false //when key: SHIFT or SPACE is down, then toggle boost to true
         	});
@@ -278,24 +289,26 @@ function initGame(){
 	//});
 
 	//Authoritative Update recieved latest game state from server, and redraws game
-	socket.on('authoritativeUpdate', function(data){
+	socket.on('authoritativeUpdate', function(data) {
 		//update entire local gamestate with (data is the game obj here)
 		game = data;//probly need to do deep copy, doubt this works
 		if(IDpassed){
 			if(player_ID in game.players){
 			redrawCanvas(ctx, game, player_ID);
-			if(!game.players[player_ID].alive){
+			if(!game.players[player_ID].alive) {
 				$('game_barrier').style.display = "block";
 				$('name_box').style.diplay = "none";
 				$('game_over_box').style.display = "block";
 			}
-			}else{
+			}
+			else {
 				//player died and was deleted
 				$('game_barrier').style.display = "block";
 				$('name_box').style.diplay = "none";
 				$('game_over_box').style.display = "block";
 			}
-		}else{
+		}
+		else {
 			//boost will not be drawn, but at least the refresh screen won't open on a new
 			//player that hasnt recieved its ID yet
 			redrawCanvas(ctx, game, player_ID);
