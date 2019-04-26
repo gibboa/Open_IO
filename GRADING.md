@@ -68,5 +68,27 @@ Did you need to learn new technologies? Did you document your learning path in a
 Are you participating in community activities such as code reviews and the discussion forum?  
 - Participated in Mattermost, bi-weekly meetings, blog posts, pull requests/reviews, play testing, bug fixing, code writing
 
+### Zack Nawrocki 
+What have you contributed back to the OS Community?  
+- Food integration
+- Visual enhancements
+- Unit testing
+- Website
+- Documentation/Learning Resources/Installation instructions/Style guidelines
+- Frontend options
+- Chat system (not used)
+- Game states
 
+How big is your codebase/where is it located
+- Most code is in [repository](https://github.com/gibboa/Open_IO)
+- My contributions are stored in my [fork](https://github.com/zacknawrocki/Open_IO), [pull requests](https://github.com/gibboa/Open_IO/pulls?q=is%3Apr+is%3Aclosed), [issue tracker](https://textuploader.com/1d57g), and [website](https://github.com/zacknawrocki/openiosite) (located in a separate repository for hosting purposes)
 
+Did you need to learn new technologies? Did you document your learning path in a tutorial?  
+- Learned JavaScript, Socket.io, HTML, CSS, Node.js, and Express 
+- All Learning Material can be found in the repo: [Link](https://github.com/gibboa/Open_IO/tree/master/LearningResources) and the README.md
+- Personal Learning Path tutorial can be found in my [Youtube playlist](https://www.youtube.com/playlist?list=PLPgx4r0FGixlivPRCBuMP0H2WPaEShrlU), followed by additional resources included in my README.md and LearningResources
+
+Are you participating in community activities such as code reviews and the discussion forum?  
+- Participated in the [Matermost Channel](https://chat.rcos.io/open-source/channels/openio)
+- Participated in weekly meetings (Wednesdays) and optional meetings (Saturdays), in which we had Scrum, code reviews, and planned our project.
+- Participated in [Open IO RCOS Blog](https://rcos.io/projects/gibboa/open_io/blog)
